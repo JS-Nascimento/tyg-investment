@@ -7,13 +7,16 @@ import br.dev.jstec.tyginvestiment.models.Currency;
 import br.dev.jstec.tyginvestiment.repository.ConversionRatesRepository;
 import br.dev.jstec.tyginvestiment.services.adapter.CurrencyAdapter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ConversionRateHandler {
 
     private final ConversionRatesRepository conversionRatesRepository;
@@ -44,5 +47,25 @@ public class ConversionRateHandler {
         return conversionRatesRepository.findTopBySourceCurrencyAndTargetCurrencyOrderByRateDateDesc(sourceCurrency, targetCurrencyId)
                 .map(cr -> new ConversionRateDto(cr.getRate(), cr.getRateDate()))
                 .orElse(null);
+    }
+
+    @Transactional
+    public void updateConversionRate(Set<Currency> targets, String currencyBase) {
+
+        var response = currencyAdapter.getLiveRates();
+
+        targets.forEach(target -> {
+            var rate = response.getConversionRates().get(target.getCode());
+            if (rate == null) {
+                rate = 0.0;
+                log.error("Invalid conversion rate to {}", target.getCode());
+            }
+            var entity = new ConversionRate();
+            entity.setSourceCurrency(currencyBase);
+            entity.setTargetCurrency(target);
+            entity.setRate(rate);
+            entity.setRateDate(LocalDateTime.now());
+            conversionRatesRepository.save(entity);
+        });
     }
 }

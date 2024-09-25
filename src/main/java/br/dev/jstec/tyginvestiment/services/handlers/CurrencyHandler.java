@@ -1,7 +1,6 @@
 package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.dto.BaseCurrencyDto;
-import br.dev.jstec.tyginvestiment.dto.ConversionRateDto;
 import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
 import br.dev.jstec.tyginvestiment.repository.CurrencyTargetRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Currency;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -71,6 +72,14 @@ public class CurrencyHandler {
 
         return dto;
     }
+
+    @Transactional
+    public void updateCurrency() {
+        var currencies = new HashSet<>(currencyRepository.findAll()) ;
+
+        conversionRateHandler.updateConversionRate(currencies, currencyBase);
+    }
+
 
     private void validateCurrency(CurrencyDto dto) {
 
