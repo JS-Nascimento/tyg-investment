@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: tyg-investments
+  datasource:
+    url: jdbc:postgresql://${DATABASE_HOST}/tyg
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 20000
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+server:
+  servlet:
+    context-path: /tyg-investments
+
+
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health,info,metrics
+#
+#
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 50000
+        readTimeout: 50000
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          openfeign: debug
+    feign:
+      client: DEBUG
+
+app:
+  config:
+    currency-base: BRL
+
+alpha-vantage:
+  api-key: ${ALPHA_VANTAGE_API_KEY}
+  base-url: https://www.alphavantage.co/query?
+
+currency-layer:
+  api-key: ${CURRENCY_LAYER_API_KEY}
+  base-url: https://api.currencylayer.com
+#  base-url: https://apilayer.net/api
+exchangerate:
+  base-url: https://v6.exchangerate-api.com/v6/${EXCHANGE_API_KEY}/latest/${app.config.currency-base}
