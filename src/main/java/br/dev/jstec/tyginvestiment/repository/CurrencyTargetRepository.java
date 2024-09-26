@@ -12,6 +12,8 @@ public interface CurrencyTargetRepository extends JpaRepository<Currency, Long> 
 
     boolean existsByCode(String code);
 
+    Set<Currency> findAllByCode(String codes);
+
     Optional<Currency> findByCode(String code);
 
 }

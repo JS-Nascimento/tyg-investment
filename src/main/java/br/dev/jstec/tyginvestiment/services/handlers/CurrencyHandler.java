@@ -31,6 +31,11 @@ public class CurrencyHandler {
         validateCurrency(dto);
         var currency = Currency.getInstance(dto.getCode());
 
+        var currencyExist = currencyRepository.findByCode(currency.getCurrencyCode());
+        if (currencyExist.isPresent()) {
+            return getBaseCurrency();
+        }
+
         var entity = new br.dev.jstec.tyginvestiment.models.Currency();
         entity.setCode(currency.getCurrencyCode());
         entity.setName(currency.getDisplayName());
@@ -47,7 +52,7 @@ public class CurrencyHandler {
     @Transactional(readOnly = true)
     public BaseCurrencyDto getBaseCurrency() {
 
-        var currency = currencyRepository.findAll();
+         var currency = currencyRepository.findAll();
 
         var baseCurrency = Currency.getInstance(currencyBase);
 
@@ -83,14 +88,6 @@ public class CurrencyHandler {
 
         if (isNull(dto) || isBlank(dto.getCode())) {
             throw new IllegalArgumentException("Invalid currency data");
-        }
-
-//        if (currencyBase.equalsIgnoreCase(dto.getCode())) {
-//            throw new IllegalArgumentException("Currency base cannot be the same as the base currency");
-//        }
-
-        if (currencyRepository.existsByCode(dto.getCode())) {
-            throw new IllegalArgumentException("Currency already exists");
         }
     }
 

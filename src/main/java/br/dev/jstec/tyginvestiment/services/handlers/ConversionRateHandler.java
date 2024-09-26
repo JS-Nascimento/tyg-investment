@@ -44,7 +44,7 @@ public class ConversionRateHandler {
 
     @Transactional(readOnly = true)
     public ConversionRateDto findLastRateToConversion(String sourceCurrency, Long targetCurrencyId) {
-        return conversionRatesRepository.findTopBySourceCurrencyAndTargetCurrencyOrderByRateDateDesc(sourceCurrency, targetCurrencyId)
+        return conversionRatesRepository.findLastConversionRate(sourceCurrency, targetCurrencyId)
                 .map(cr -> new ConversionRateDto(cr.getRate(), cr.getRateDate()))
                 .orElse(null);
     }

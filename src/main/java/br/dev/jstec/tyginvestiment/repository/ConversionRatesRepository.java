@@ -18,4 +18,17 @@ public interface ConversionRatesRepository extends JpaRepository<ConversionRate,
             ORDER BY cr.rateDate DESC
             """)
     Optional<ConversionRate> findTopBySourceCurrencyAndTargetCurrencyOrderByRateDateDesc(@Param("sourceCurrency") String sourceCurrency, @Param("targetCurrencyId") Long targetCurrencyId);
+    @Query("""
+            SELECT cr
+            FROM ConversionRate cr
+            WHERE cr.sourceCurrency = :sourceCurrency
+                AND cr.targetCurrency.id = :targetCurrencyId
+                AND cr.rateDate = (
+                                    SELECT MAX(cr2.rateDate)
+                                    FROM ConversionRate cr2
+                                    WHERE cr2.sourceCurrency = :sourceCurrency
+                                    AND cr2.targetCurrency.id = :targetCurrencyId
+                                     )
+            """)
+    Optional<ConversionRate> findLastConversionRate(@Param("sourceCurrency") String sourceCurrency, @Param("targetCurrencyId") Long targetCurrencyId);
 }
