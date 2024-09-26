@@ -10,8 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Currency;
 import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -68,7 +66,7 @@ public class CurrencyHandler {
                             conversionRateHandler.findLastRateToConversion(currencyBase, c.getId()));
                     return currencyDto;
                 })
-                .collect(Collectors.toSet()));
+                .toList());
 
         return dto;
     }
@@ -87,12 +85,16 @@ public class CurrencyHandler {
             throw new IllegalArgumentException("Invalid currency data");
         }
 
-        if (currencyBase.equalsIgnoreCase(dto.getCode())) {
-            throw new IllegalArgumentException("Currency base cannot be the same as the base currency");
-        }
+//        if (currencyBase.equalsIgnoreCase(dto.getCode())) {
+//            throw new IllegalArgumentException("Currency base cannot be the same as the base currency");
+//        }
 
         if (currencyRepository.existsByCode(dto.getCode())) {
             throw new IllegalArgumentException("Currency already exists");
         }
+    }
+
+    public br.dev.jstec.tyginvestiment.models.Currency getCurrencyByCode(String code) {
+       return  currencyRepository.findByCode(code).orElseThrow();
     }
 }

@@ -2,6 +2,7 @@ package br.dev.jstec.tyginvestiment.dto;
 
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -13,6 +14,6 @@ public class BaseCurrencyDto {
 
     private String symbol;
 
-    private Set<CurrencyDto> currencies;
+    private List<CurrencyDto> currencies;
 
 }

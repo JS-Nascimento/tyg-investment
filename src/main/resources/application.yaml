@@ -22,6 +22,7 @@ server:
     context-path: /tyg-investments
 
 
+
 #management:
 #  endpoints:
 #    web:
