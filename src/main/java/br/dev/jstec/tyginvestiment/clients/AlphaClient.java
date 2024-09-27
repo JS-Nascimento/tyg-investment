@@ -1,14 +1,13 @@
 package br.dev.jstec.tyginvestiment.clients;
 
-import br.dev.jstec.tyginvestiment.dto.ExchangeRateApiResponse;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
-
-@FeignClient(name = "alphaClient", url = "${exchangerate.base-url}")
+import org.springframework.web.bind.annotation.RequestParam;
+@FeignClient(name = "alphaClient", url = "${alpha-vantage.base-url}")
 public interface AlphaClient {
 
-    @GetMapping
+    @GetMapping("${alpha-vantage.get-info-assets}symbol={symbol}&apikey=${alpha-vantage.api-key}")
     @Cacheable("exchange-rates")
-    ExchangeRateApiResponse getLiveExchangeRates();
+    AlphaVantageClient getAssetInfo(@RequestParam("symbol") String symbol);
 }

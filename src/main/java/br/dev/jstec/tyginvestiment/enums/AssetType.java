@@ -35,6 +35,12 @@ public enum AssetType {
     public static boolean isStock(AssetType assetType) {
         return assetType == STOCK;
     }
+    public static AssetType isStock(String assetType) {
+        if (assetType == null) {
+            return OTHER;
+        }
+        return assetType.toUpperCase().contains(STOCK.name()) ? STOCK : OTHER;
+    }
 
     public static boolean isCommodity(AssetType assetType) {
         return assetType == COMMODITY;

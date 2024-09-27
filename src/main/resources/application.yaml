@@ -53,7 +53,9 @@ app:
 
 alpha-vantage:
   api-key: ${ALPHA_VANTAGE_API_KEY}
-  base-url: https://www.alphavantage.co/query?
+  base-url: https://www.alphavantage.co
+  get-info-assets: /query?function=OVERVIEW&
+#  apikey=YZROOJD0LTCC5GNE
 
 currency-layer:
   api-key: ${CURRENCY_LAYER_API_KEY}

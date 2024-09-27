@@ -1,30 +1,21 @@
-package br.dev.jstec.tyginvestiment.models;
+package br.dev.jstec.tyginvestiment.dto;
 
 import br.dev.jstec.tyginvestiment.enums.AssetType;
-import jakarta.persistence.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-@Entity
-@Table(name = "assets")
-@EqualsAndHashCode(callSuper = true)
-public class Asset extends Auditable<Long>{
+public class AssetDto {
 
-    @Id
     private String symbol;
 
-    @Enumerated(EnumType.STRING)
-    private AssetType assetType;
+    private AssetType type;
 
-    @Column(length = 100)
     private String name;
 
-    @Column(length = 2000)
     private String description;
 
     private String cik;

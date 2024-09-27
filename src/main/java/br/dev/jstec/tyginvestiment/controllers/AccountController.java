@@ -18,7 +18,7 @@ public class AccountController {
 
     private final AccountHandler handler;
 
-    @PostMapping
+@PostMapping()
     public ResponseEntity<AccountDto> saveAccount(@RequestBody AccountDto dto) {
         var account = handler.saveAccount(dto);
         return ResponseEntity.status(201).body(account);
