@@ -1,7 +1,7 @@
 package br.dev.jstec.tyginvestiment.controllers;
 
-import br.dev.jstec.tyginvestiment.dto.AssetDto;
-import br.dev.jstec.tyginvestiment.services.handlers.AssetHandler;
+import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
+import br.dev.jstec.tyginvestiment.services.handlers.StockHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AssetController {
 
-    private final AssetHandler handler;
+    private final StockHandler handler;
 
     @PostMapping("/stocks")
-    public ResponseEntity<AssetDto> saveAsset(@RequestParam String symbol) {
+    public ResponseEntity<StockDto> saveAsset(@RequestParam String symbol) {
 
-        var asset = handler.saveAsset(symbol.toUpperCase());
+        var asset = handler.save(symbol.toUpperCase());
 
         return ResponseEntity.status(201).body(asset);
     }

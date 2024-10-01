@@ -11,9 +11,9 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "assets")
+@Table(name = "account_holdings")
 @EqualsAndHashCode(callSuper = true)
-public class AssetAllocation extends Auditable<Long>{
+public class AccountHolding extends Auditable<Long>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,15 +27,16 @@ public class AssetAllocation extends Auditable<Long>{
     @JoinColumn(name = "asset_id")
     private Asset asset;
 
-    private double initialQuantity;
+    @Column(precision = 12, scale = 4 )
+    private BigDecimal initialQuantity;
 
-    private double quantity;
+    @Column(precision = 12, scale = 4 )
+    private BigDecimal quantity;
 
+    @Column(precision = 12, scale = 4 )
     private BigDecimal initialPrice;
 
-    private BigDecimal price;
-
-    private BigDecimal averagePrice;
-
     private LocalDate purchaseDate;
+
+    private LocalDate dueDate;
 }

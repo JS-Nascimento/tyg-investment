@@ -1,26 +1,17 @@
-package br.dev.jstec.tyginvestiment.dto;
+package br.dev.jstec.tyginvestiment.dto.assetstype;
 
-import br.dev.jstec.tyginvestiment.enums.AssetType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class AssetDto {
-
-    private String symbol;
-
-    private AssetType type;
-
-    private String name;
-
-    private String description;
-
+public class StockDto extends AssetDto {
     private String cik;
     private String exchange;
-    private String currency;
     private String country;
     private String sector;
     private String industry;
@@ -50,4 +41,5 @@ public class AssetDto {
     private String sharesOutstanding;
     private LocalDate dividendDate;
     private LocalDate exDividendDate;
+
 }

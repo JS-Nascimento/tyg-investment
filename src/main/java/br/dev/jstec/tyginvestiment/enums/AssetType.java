@@ -78,4 +78,45 @@ public enum AssetType {
         return assetType == OTHER;
     }
 
+    public static String getBaseType(String assetType) {
+        if (assetType == null) {
+            return OTHER.name().toUpperCase();
+        }
+
+        if (assetType.toUpperCase().contains(STOCK.name())) {
+            return STOCK.name().toUpperCase();
+        }
+        if (assetType.toUpperCase().contains(ADR.name())) {
+            return STOCK.name().toUpperCase();
+        }
+        if (assetType.toUpperCase().contains(CRYPTO.name())) {
+            return CRYPTO.name().toUpperCase();
+        }
+        if (assetType.toUpperCase().contains(CURRENCY.name())) {
+            return CURRENCY.name().toUpperCase();
+        }
+        if (assetType.toUpperCase().contains(COMMODITY.name())) {
+            return COMMODITY.name().toUpperCase();
+        }
+        if (assetType.toUpperCase().contains(BOND.name())) {
+            return BOND.name().toUpperCase();
+        }
+        if (assetType.toUpperCase().contains(FUND.name())) {
+            return FUND.name().toUpperCase();
+        }
+        if (assetType.toUpperCase().contains(INDEX.name())) {
+            return INDEX.name().toUpperCase();
+        }
+        if (assetType.toUpperCase().contains(ETF.name())) {
+            return ETF.name().toUpperCase();
+        }
+        if (assetType.toUpperCase().contains(OPTION.name())) {
+            return OPTION.name().toUpperCase();
+        }
+        if (assetType.toUpperCase().contains(FUTURE.name())) {
+            return FUTURE.name().toUpperCase();
+        }
+        return OTHER.name().toUpperCase();
+    }
+
 }

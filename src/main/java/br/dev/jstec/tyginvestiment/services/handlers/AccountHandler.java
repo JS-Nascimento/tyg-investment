@@ -34,7 +34,18 @@ public class AccountHandler {
         return getAccountDto(account);
     }
 
+    public AccountDto findById(Long id) {
+        var account = accountRepository.findById(id).orElse(null);
+
+        return getAccountDto(account);
+    }
+
     private static AccountDto getAccountDto(Account account) {
+
+        if (account == null) {
+            return null;
+        }
+
         var accountDto = new AccountDto();
         accountDto.setId(account.getId());
         accountDto.setDescription(account.getDescription());
