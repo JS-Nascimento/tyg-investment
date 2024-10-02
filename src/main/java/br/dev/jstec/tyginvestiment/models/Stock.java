@@ -11,7 +11,6 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @Entity
-
 @EqualsAndHashCode(callSuper = true)
 public class Stock extends Asset {
 

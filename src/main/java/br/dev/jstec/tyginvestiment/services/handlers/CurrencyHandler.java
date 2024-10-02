@@ -3,6 +3,7 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 import br.dev.jstec.tyginvestiment.dto.BaseCurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
 import br.dev.jstec.tyginvestiment.repository.CurrencyTargetRepository;
+import br.dev.jstec.tyginvestiment.services.mappers.CurrencyMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ public class CurrencyHandler {
 
     private final CurrencyTargetRepository currencyRepository;
     private final ConversionRateHandler conversionRateHandler;
+    private final CurrencyMapper mapper;
 
     @Value("${app.config.currency-base}")
     private String currencyBase;
@@ -36,12 +38,7 @@ public class CurrencyHandler {
             return getBaseCurrency();
         }
 
-        var entity = new br.dev.jstec.tyginvestiment.models.Currency();
-        entity.setCode(currency.getCurrencyCode());
-        entity.setName(currency.getDisplayName());
-        entity.setSymbol(currency.getSymbol());
-        entity.setDecimalPlaces(dto.getDecimalPlaces());
-
+        var entity = mapper.toEntity(dto);
         var saved = currencyRepository.save(entity);
 
         conversionRateHandler.saveConversionRate(saved, currencyBase);
@@ -91,6 +88,7 @@ public class CurrencyHandler {
         }
     }
 
+    @Transactional(readOnly = true)
     public br.dev.jstec.tyginvestiment.models.Currency getCurrencyByCode(String code) {
        return  currencyRepository.findByCode(code).orElseThrow();
     }

@@ -1,7 +1,12 @@
 package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.dto.AccountHoldingDto;
+import br.dev.jstec.tyginvestiment.dto.assetstype.AssetDto;
+import br.dev.jstec.tyginvestiment.models.Account;
+import br.dev.jstec.tyginvestiment.models.Asset;
 import br.dev.jstec.tyginvestiment.repository.AccountHoldingRepository;
+import br.dev.jstec.tyginvestiment.services.mappers.AccountHoldingMapper;
+import br.dev.jstec.tyginvestiment.services.mappers.AccountMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,9 +19,13 @@ import static br.dev.jstec.tyginvestiment.enums.AssetType.getBaseType;
 public class AccountHoldingHandler {
 
     private final AccountHoldingRepository repository;
+    private final AccountHoldingMapper mapper;
     private final AccountHandler accountHandler;
     private final StockHandler stockHandler;
-    private final Map<String, AssetHandler> handlers;
+
+    private final Map<String, AssetHandler<? extends Asset, ? extends AssetDto>> handlers;
+
+
 
     public AccountHoldingDto save(AccountHoldingDto dto) {
         var account = accountHandler.findById(dto.getAccount().getId());
@@ -36,9 +45,8 @@ public class AccountHoldingHandler {
         dto.setAccount(account);
         dto.setAsset(asset);
 
-        var entity = repository.save(dto.toEntity());
+        var entity = repository.save(mapper.toEntity(dto));
 
-        //return entity.toDto();
-        return null;
+        return mapper.toDto(entity);
     }
 }
