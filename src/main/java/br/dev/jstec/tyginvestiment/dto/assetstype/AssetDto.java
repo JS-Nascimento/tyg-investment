@@ -1,13 +1,21 @@
 package br.dev.jstec.tyginvestiment.dto.assetstype;
 
 import br.dev.jstec.tyginvestiment.enums.AssetType;
-import jakarta.persistence.MappedSuperclass;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@MappedSuperclass
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@type"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = StockDto.class, name = "stock")
+})
 public abstract class AssetDto {
 
     private String symbol;
