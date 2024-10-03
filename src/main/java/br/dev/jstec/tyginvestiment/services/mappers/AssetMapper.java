@@ -9,27 +9,20 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
-public interface AssetMapper {
+public abstract class AssetMapper {
 
-    @Mapping(target = "assetType", source = "type", qualifiedByName = "stringToAssetType")
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "lastModifiedBy", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
-    Stock toEntity(StockDto dto);
+    @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
+    public abstract Stock toEntity(StockDto dto);
 
-    @Mapping(target = "assetType", source = "assetType", qualifiedByName = "stringToAssetType")
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "lastModifiedBy", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
-    Stock toEntity(AlphaVantageClient dto);
+    @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
+    public abstract Stock toEntity(AlphaVantageClient dto);
 
-    @Mapping(target = "type", source = "assetType")
-    StockDto toDto(Stock entity);
+    @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
+    public abstract StockDto toDto(Stock entity);
 
-    @Named("stringToAssetType")
-    default AssetType stringToAssetType(String assetType) {
+    @Named("mapAssetType")
+    public AssetType mapAssetType(String assetType) {
         return AssetType.valueOf(assetType);
     }
+
 }

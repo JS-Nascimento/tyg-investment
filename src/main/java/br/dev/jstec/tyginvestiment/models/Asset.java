@@ -16,16 +16,16 @@ import lombok.NoArgsConstructor;
 public abstract class Asset extends Auditable<Long>{
 
     @Id
-    private String symbol;
+    protected String symbol;
 
     @Enumerated(EnumType.STRING)
-    private AssetType assetType;
+    protected AssetType assetType;
 
     @Column(length = 100)
-    private String name;
+    protected String name;
 
     @Column(length = 2000)
-    private String description;
+    protected String description;
 
-    private String currency;
+    protected String currency;
 }

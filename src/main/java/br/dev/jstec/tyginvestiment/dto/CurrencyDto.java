@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class CurrencyDto {
 
+
     private String code;
 
     private String name;
@@ -12,6 +13,8 @@ public class CurrencyDto {
     private String symbol;
 
     private int decimalPlaces;
+
+    private boolean currencyBase;
 
     private ConversionRateDto conversionRate;
 }

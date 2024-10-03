@@ -9,38 +9,48 @@ import br.dev.jstec.tyginvestiment.services.handlers.CurrencyHandler;
 import br.dev.jstec.tyginvestiment.services.handlers.UserHandler;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+import org.mapstruct.ObjectFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(componentModel = "spring", uses = {UserMapper.class, CurrencyMapper.class})
-public interface AccountMapper {
+@Mapper(componentModel = "spring")
+public abstract class AccountMapper {
 
-    @Mapping(target = "userId", source = "java(entity.getUser().getId())")
-    AccountDto toDto(Account entity);
+    @Autowired
+    private UserHandler userHandler;
+    @Autowired
+    private CurrencyHandler currencyHandler;
 
-
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "lastModifiedBy", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "accountType", source = "type", qualifiedByName = "stringToAccountType")
-    @Mapping(target = "currency", source = "currency", qualifiedByName = "currencyByCode")
-    @Mapping(target = "user", source = "userId", qualifiedByName = "userById")
-    Account toEntity(AccountDto dto);
-
-    @Named("stringToAccountType")
-    default AccountType stringToAccountType(String accountType) {
-        return AccountType.valueOf(accountType);
+    @ObjectFactory
+    public Account toEntity(AccountDto dto) {
+        Account account = new Account();
+        account.setId(dto.getId());
+        account.setDescription(dto.getDescription());
+        account.setAccountType(AccountType.valueOf(dto.getAccountType()));
+        account.setBank(dto.getBank());
+        account.setInitialBalance(dto.getInitialBalance());
+        account.setTotalBalance(dto.getTotalBalance());
+        account.setAvailableBalance(dto.getAvailableBalance());
+        account.setUser(userHandler.getUserById(dto.getUserId()));
+        account.setCurrency(currencyHandler.getCurrencyByCode(dto.getCurrency()));
+        return account;
     }
 
-    @Named("currencyByCode")
-    default Currency getCurrencyByCode(String currency, @Context CurrencyHandler currencyHandler) {
-        return currencyHandler.getCurrencyByCode(currency);
+    @ObjectFactory
+    public AccountDto toDto(Account entity) {
+        AccountDto accountDto = new AccountDto();
+        accountDto.setId(entity.getId());
+        accountDto.setDescription(entity.getDescription());
+        accountDto.setAccountType(entity.getAccountType().name());
+        accountDto.setBank(entity.getBank());
+        accountDto.setInitialBalance(entity.getInitialBalance());
+        accountDto.setTotalBalance(entity.getTotalBalance());
+        accountDto.setAvailableBalance(entity.getAvailableBalance());
+        accountDto.setUserId(entity.getUser().getId());
+        accountDto.setCreatedBy(entity.getCreatedBy());
+        accountDto.setCreatedDate(entity.getCreatedDate());
+        accountDto.setLastModifiedBy(entity.getLastModifiedBy());
+        accountDto.setLastModifiedDate(entity.getLastModifiedDate());
+        accountDto.setCurrency(entity.getCurrency().getCode());
+        return accountDto;
     }
-
-    @Named("userById")
-    default Long getUserById(Long userId, @Context UserHandler userHandler) {
-        return userHandler.getUserById(userId).getId();
-    }
-
 }

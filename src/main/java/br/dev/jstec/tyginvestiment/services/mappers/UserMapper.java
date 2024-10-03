@@ -10,9 +10,5 @@ public interface UserMapper {
 
     UserDto toDto(User entity);
 
-    @Mapping(target = "lastModifiedDate", ignore = true)
-    @Mapping(target = "lastModifiedBy", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
     User toEntity(UserDto dto);
 }
