@@ -43,13 +43,13 @@ public abstract class AccountHoldingMapper {
         AccountHoldingDto accountHoldingDto = new AccountHoldingDto();
 
         if (entity.getAccount() != null) {
-            accountHoldingDto.setAccount(accountMapper.toDto(entity.getAccount()));
+            accountHoldingDto.setAccount(accountMapper.toDtoSimplified(entity.getAccount()));
         }
 
         accountHoldingDto.setId(entity.getId());
 
         if (entity.getAsset() != null && entity.getAsset() instanceof Stock stock) {
-            accountHoldingDto.setAsset(assetMapper.toDto(stock));
+            accountHoldingDto.setAsset(assetMapper.toDtoSimplified(stock));
         }
 
         accountHoldingDto.setInitialQuantity(entity.getInitialQuantity());
@@ -57,6 +57,7 @@ public abstract class AccountHoldingMapper {
         accountHoldingDto.setInitialPrice(entity.getInitialPrice());
         accountHoldingDto.setPurchaseDate(entity.getPurchaseDate());
         accountHoldingDto.setDueDate(entity.getDueDate());
+
         return accountHoldingDto;
     }
 

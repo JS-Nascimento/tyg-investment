@@ -1,5 +1,6 @@
 package br.dev.jstec.tyginvestiment.dto.assetstype;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class StockDto extends AssetDto {
     private String cik;
     private String exchange;

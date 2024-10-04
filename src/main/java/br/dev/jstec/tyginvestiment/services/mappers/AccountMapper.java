@@ -53,4 +53,14 @@ public abstract class AccountMapper {
         accountDto.setCurrency(entity.getCurrency().getCode());
         return accountDto;
     }
+
+    @ObjectFactory
+    public AccountDto toDtoSimplified(Account entity) {
+        AccountDto accountDto = new AccountDto();
+        accountDto.setId(entity.getId());
+        accountDto.setAccountType(entity.getAccountType().name());
+        accountDto.setBank(entity.getBank());
+        accountDto.setCurrency(entity.getCurrency().getCode());
+        return accountDto;
+    }
 }

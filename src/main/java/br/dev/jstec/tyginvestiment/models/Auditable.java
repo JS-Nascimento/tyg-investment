@@ -3,6 +3,7 @@ package br.dev.jstec.tyginvestiment.models;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Data
 @NoArgsConstructor
+@Getter
 public abstract class Auditable<U> {
 
     @CreatedBy

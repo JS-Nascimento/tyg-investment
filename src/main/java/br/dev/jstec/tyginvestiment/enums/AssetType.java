@@ -39,7 +39,7 @@ public enum AssetType {
         if (assetType == null) {
             return OTHER;
         }
-        return assetType.toUpperCase().contains(STOCK.name()) ? STOCK : OTHER;
+        return assetType.toUpperCase().contains(STOCK.name()) ? STOCK : fromString(assetType);
     }
 
     public static boolean isCommodity(AssetType assetType) {

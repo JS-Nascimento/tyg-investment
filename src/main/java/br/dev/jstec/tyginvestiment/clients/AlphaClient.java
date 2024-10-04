@@ -10,4 +10,8 @@ public interface AlphaClient {
     @GetMapping("${alpha-vantage.get-info-assets}symbol={symbol}&apikey=${alpha-vantage.api-key}")
     @Cacheable("exchange-rates")
     AlphaVantageClient getAssetInfo(@RequestParam("symbol") String symbol);
+
+    @GetMapping("${alpha-vantage.get-daily-time-series}symbol={symbol}&apikey=${alpha-vantage.api-key}")
+    @Cacheable("exchange-rates")
+    AlphaVantageTimeSeriesDto getAssetHistory(@RequestParam("symbol") String symbol);
 }

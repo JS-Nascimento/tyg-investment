@@ -55,7 +55,11 @@ alpha-vantage:
   api-key: ${ALPHA_VANTAGE_API_KEY}
   base-url: https://www.alphavantage.co
   get-info-assets: /query?function=OVERVIEW&
+  get-daily-time-series: /query?function=TIME_SERIES_DAILY&
 #  apikey=YZROOJD0LTCC5GNE
+
+#https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=PETR4.SAO&apikey=YZROOJD0LTCC5GNE -- diaria
+#https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=PETR4.SAO&apikey=YZROOJD0LTCC5GNE -- ultimos 100 dias
 
 currency-layer:
   api-key: ${CURRENCY_LAYER_API_KEY}

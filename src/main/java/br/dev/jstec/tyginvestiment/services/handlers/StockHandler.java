@@ -4,6 +4,8 @@ import br.dev.jstec.tyginvestiment.clients.AlphaClient;
 import br.dev.jstec.tyginvestiment.clients.AlphaVantageClient;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
 import br.dev.jstec.tyginvestiment.models.Stock;
+import br.dev.jstec.tyginvestiment.models.StockQuotation;
+import br.dev.jstec.tyginvestiment.repository.StockQuotationRepository;
 import br.dev.jstec.tyginvestiment.repository.StockRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
 
     private final AssetMapper mapper;
     private final StockRepository stockRepository;
+    private final StockQuotationRepository stockQuotationRepository;
     private final AlphaClient alphaClient;
 
     @Override
@@ -37,7 +40,13 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
 
         var entity = mapper.toEntity(asset);
 
-        return mapper.toDto(stockRepository.save(entity));
+        var entitySaved = stockRepository.save(entity);
+
+        if(nonNull(entitySaved.getSymbol())) {
+            getAssetHistory(entitySaved);
+        }
+
+        return mapper.toDto(entitySaved);
     }
 
     @Override
@@ -71,4 +80,36 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
 
         return asset;
     }
+
+    private void getAssetHistory(Stock stock) {
+        var history = alphaClient.getAssetHistory(stock.getSymbol());
+
+        if (nonNull(history.getInformation())) {
+            throw new RuntimeException(format("Error getting asset history with {0}", history.getInformation()));
+        }
+        if (nonNull(history.getErrorMessage())) {
+            throw new RuntimeException(format("Error getting asset history with {0}", history.getErrorMessage()));
+        }
+
+        if (history.getTimeSeriesDaily().isEmpty()) {
+            throw new RuntimeException("Asset History not found");
+        }
+
+        var quotations = history.getTimeSeriesDaily().entrySet().stream()
+                .map(entry -> {
+                    var quotation = new StockQuotation();
+                    quotation.setStock(stock);
+                    quotation.setDate(entry.getKey());
+                    quotation.setOpen(entry.getValue().getOpen());
+                    quotation.setHigh(entry.getValue().getHigh());
+                    quotation.setLow(entry.getValue().getLow());
+                    quotation.setClose(entry.getValue().getClose());
+                    quotation.setVolume(entry.getValue().getVolume());
+                    return quotation;
+                })
+                .toList();
+
+        stockQuotationRepository.saveAllAndFlush(quotations);
+    }
+
 }

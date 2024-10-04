@@ -4,6 +4,7 @@ import br.dev.jstec.tyginvestiment.clients.AlphaVantageClient;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
 import br.dev.jstec.tyginvestiment.enums.AssetType;
 import br.dev.jstec.tyginvestiment.models.Stock;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -20,9 +21,17 @@ public abstract class AssetMapper {
     @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
     public abstract StockDto toDto(Stock entity);
 
+    @BeanMapping(ignoreByDefault = true)
+    @Mapping(target = "symbol", source = "symbol")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "currency", source = "currency")
+    @Mapping(target = "country", source = "country")
+    @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
+    public abstract StockDto toDtoSimplified(Stock entity);
+
     @Named("mapAssetType")
     public AssetType mapAssetType(String assetType) {
-        return AssetType.valueOf(assetType);
+        return AssetType.isStock(assetType);
     }
 
 }

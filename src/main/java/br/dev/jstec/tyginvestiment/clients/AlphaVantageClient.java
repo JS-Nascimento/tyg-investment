@@ -1,13 +1,14 @@
 package br.dev.jstec.tyginvestiment.clients;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class AlphaVantageClient {
+public class AlphaVantageClient extends AlphaVantageInformation {
 
     @JsonProperty("Symbol")
     private String symbol;
@@ -117,13 +118,5 @@ public class AlphaVantageClient {
     private String dividendDate;
     @JsonProperty("ExDividendDate")
     private String exDividendDate;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("Error Message")
-    private String errorMessage;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("Information")
-    private String information;
 
 }
