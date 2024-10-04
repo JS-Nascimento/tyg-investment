@@ -1,6 +1,7 @@
 package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.dto.AccountDto;
+import br.dev.jstec.tyginvestiment.dto.accountsummary.InvestmentSummaryStatementDto;
 import br.dev.jstec.tyginvestiment.repository.AccountRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AccountMapper;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,18 @@ public class AccountHandler {
         var account = accountRepository.findById(id).orElse(null);
 
         return mapper.toDto(account);
+    }
+
+    @Transactional(readOnly = true)
+    public InvestmentSummaryStatementDto getAccountSummary(Long id) {
+        var account = findById(id);
+
+        if (account == null) {
+            return null;
+        }
+
+
+
+        return null;
     }
 }
