@@ -1,6 +1,6 @@
 package br.dev.jstec.tyginvestiment.jobs;
 
-import br.dev.jstec.tyginvestiment.services.handlers.CurrencyHandler;
+import br.dev.jstec.tyginvestiment.services.handlers.StockQuotationHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -10,14 +10,14 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class CurrencyJobService {
+public class AssetJobService {
 
-    private final CurrencyHandler currencyHandler;
+    private final StockQuotationHandler handler;
 
-    @Scheduled(cron = "0 0 6-22/8 ? * MON-FRI")
+    @Scheduled(cron = "0 0 20 ? * MON-FRI")
     @Async
     public void updateCurrencyRateConversion() {
-        currencyHandler.updateCurrency();
-        log.info("Atualização de taxa de conversão executado de forma assíncrona: " + Thread.currentThread().getName());
+        handler.updateQuotations();
+        log.info("Cotações atualizadas com sucesso");
     }
 }

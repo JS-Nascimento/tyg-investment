@@ -1,6 +1,7 @@
 package br.dev.jstec.tyginvestiment.services.mappers;
 
 import br.dev.jstec.tyginvestiment.dto.AccountHoldingDto;
+import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
 import br.dev.jstec.tyginvestiment.models.AccountHolding;
 import br.dev.jstec.tyginvestiment.models.Stock;
@@ -29,6 +30,11 @@ public abstract class AccountHoldingMapper {
         if (dto.getAsset() instanceof StockDto stockDto) {
             accountHolding.setAsset(assetMapper.toEntity(stockDto));
         }
+
+        if (dto.getAsset() instanceof FundDto fundDto) {
+            accountHolding.setAsset(assetMapper.toEntity(fundDto));
+        }
+
 
         accountHolding.setInitialQuantity(dto.getInitialQuantity());
         accountHolding.setQuantity(dto.getQuantity());

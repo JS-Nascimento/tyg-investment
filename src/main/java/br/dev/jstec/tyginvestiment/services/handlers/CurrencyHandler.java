@@ -4,6 +4,7 @@ import br.dev.jstec.tyginvestiment.dto.BaseCurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
 import br.dev.jstec.tyginvestiment.repository.CurrencyTargetRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.CurrencyMapper;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,8 +25,13 @@ public class CurrencyHandler {
     private final ConversionRateHandler conversionRateHandler;
     private final CurrencyMapper mapper;
 
+    @Getter
     @Value("${app.config.currency-base}")
     private String currencyBase;
+
+    @Getter
+    @Value("${app.config.decimal-places}")
+    private Integer decimalPlaces;
 
     @Transactional
     public BaseCurrencyDto saveCurrency(CurrencyDto dto) {
@@ -80,16 +86,20 @@ public class CurrencyHandler {
         conversionRateHandler.updateConversionRate(currencies, currencyBase);
     }
 
+    @Transactional(readOnly = true)
+    public br.dev.jstec.tyginvestiment.models.Currency getCurrencyByCode(String code) {
+        return currencyRepository.findByCode(code).orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean exists(String code) {
+        return currencyRepository.existsByCode(code);
+    }
 
     private void validateCurrency(CurrencyDto dto) {
 
         if (isNull(dto) || isBlank(dto.getCode())) {
             throw new IllegalArgumentException("Invalid currency data");
         }
-    }
-
-    @Transactional(readOnly = true)
-    public br.dev.jstec.tyginvestiment.models.Currency getCurrencyByCode(String code) {
-       return  currencyRepository.findByCode(code).orElseThrow();
     }
 }

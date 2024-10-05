@@ -11,6 +11,8 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static java.util.Objects.nonNull;
+
 @Data
 @NoArgsConstructor
 @Entity
@@ -87,39 +89,26 @@ import java.time.LocalDateTime;
         resultSetMapping = "PortfolioOverviewDto"
 )
 public class PortfolioOverviewDto {
-
     @Id
     private Long id;
-
     private AssetType type;
-
     private String asset;
-
     private String currency;
-
     private BigDecimal initialQuantity;
-
     private BigDecimal quantity;
-
     private BigDecimal initialPrice;
-
     private LocalDate purchaseDate;
-
     private BigDecimal price;
-
     private LocalDate priceDate;
-
     private BigDecimal value;
-
     private BigDecimal profit;
-
     private BigDecimal rate;
-
     private LocalDateTime rateDate;
-
     private BigDecimal valueConverted;
 
     public BigDecimal getValueConverted() {
-        return value.divide(rate, MathContext.DECIMAL128).setScale(3, RoundingMode.HALF_UP);
+        return nonNull(value)
+                ? value.divide(rate, MathContext.DECIMAL128).setScale(3, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO;
     }
 }

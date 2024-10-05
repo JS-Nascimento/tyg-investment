@@ -28,7 +28,7 @@ public class StockQuotation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stock_id")
     @Cascade(ALL)
-    private Stock stock;
+    private Asset stock;
 
     private LocalDate date;
 
@@ -41,4 +41,10 @@ public class StockQuotation {
     private BigDecimal close;
 
     private Long volume;
+
+    private BigDecimal previousClose;
+
+    private BigDecimal change;
+
+    private String changePercent;
 }

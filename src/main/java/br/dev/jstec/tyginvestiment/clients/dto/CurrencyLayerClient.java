@@ -1,4 +1,4 @@
-package br.dev.jstec.tyginvestiment.clients;
+package br.dev.jstec.tyginvestiment.clients.dto;
 
 import br.dev.jstec.tyginvestiment.dto.CurrencyLayerResponse;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,8 +1,11 @@
 package br.dev.jstec.tyginvestiment.services.mappers;
 
-import br.dev.jstec.tyginvestiment.clients.AlphaVantageClient;
+import br.dev.jstec.tyginvestiment.clients.dto.AlphaVantageClient;
+import br.dev.jstec.tyginvestiment.clients.dto.EtfProfileDto;
+import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
 import br.dev.jstec.tyginvestiment.enums.AssetType;
+import br.dev.jstec.tyginvestiment.models.Fund;
 import br.dev.jstec.tyginvestiment.models.Stock;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -16,10 +19,19 @@ public abstract class AssetMapper {
     public abstract Stock toEntity(StockDto dto);
 
     @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
+    public abstract Fund toEntity(FundDto dto);
+
+    @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
     public abstract Stock toEntity(AlphaVantageClient dto);
 
     @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
+    public abstract Fund toEntity(EtfProfileDto dto);
+
+    @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
     public abstract StockDto toDto(Stock entity);
+
+    @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
+    public abstract FundDto toDto(Fund entity);
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "symbol", source = "symbol")

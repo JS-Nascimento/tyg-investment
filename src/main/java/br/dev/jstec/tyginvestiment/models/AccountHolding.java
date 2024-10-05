@@ -20,11 +20,11 @@ public class AccountHolding extends Auditable<Long>{
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
     @ManyToOne
-    @JoinColumn(name = "asset_id")
+    @JoinColumn(name = "asset_id", nullable = false)
     private Asset asset;
 
     @Column(precision = 12, scale = 4 )

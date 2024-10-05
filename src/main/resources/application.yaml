@@ -45,26 +45,36 @@ logging:
         cloud:
           openfeign: debug
     feign:
-      client: DEBUG
+      client: debug
 
 app:
   config:
     currency-base: BRL
+    decimal-places: 4
 
 alpha-vantage:
-  api-key: ${ALPHA_VANTAGE_API_KEY}
+  api-keys:
+    - ${ALPHA_VANTAGE_API_KEY_0}
+    - ${ALPHA_VANTAGE_API_KEY_1}
+    - ${ALPHA_VANTAGE_API_KEY_2}
+    - ${ALPHA_VANTAGE_API_KEY_3}
+    - ${ALPHA_VANTAGE_API_KEY_4}
+    - ${ALPHA_VANTAGE_API_KEY_5}
+    - ${ALPHA_VANTAGE_API_KEY_6}
+    - ${ALPHA_VANTAGE_API_KEY_7}
+    - ${ALPHA_VANTAGE_API_KEY_8}
+    - ${ALPHA_VANTAGE_API_KEY_9}
+    - ${ALPHA_VANTAGE_API_KEY_10}
+
   base-url: https://www.alphavantage.co
   get-info-assets: /query?function=OVERVIEW&
   get-daily-time-series: /query?function=TIME_SERIES_DAILY&
-#  apikey=YZROOJD0LTCC5GNE
-
-#https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=PETR4.SAO&apikey=YZROOJD0LTCC5GNE -- diaria
-#https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=PETR4.SAO&apikey=YZROOJD0LTCC5GNE -- ultimos 100 dias
+  get-global-quote: /query?function=GLOBAL_QUOTE&
+  get-etf-profile: /query?function=ETF_PROFILE&
 
 currency-layer:
   api-key: ${CURRENCY_LAYER_API_KEY}
   base-url: https://api.currencylayer.com
-#  base-url: https://apilayer.net/api
 
 exchangerate:
   base-url: https://v6.exchangerate-api.com/v6/${EXCHANGE_API_KEY}/latest/${app.config.currency-base}

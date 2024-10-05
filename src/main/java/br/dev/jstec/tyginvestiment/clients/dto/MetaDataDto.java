@@ -1,4 +1,4 @@
-package br.dev.jstec.tyginvestiment.clients;
+package br.dev.jstec.tyginvestiment.clients.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

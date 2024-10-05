@@ -1,11 +1,10 @@
 package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.clients.AlphaClient;
-import br.dev.jstec.tyginvestiment.clients.AlphaVantageClient;
+import br.dev.jstec.tyginvestiment.clients.dto.AlphaVantageClient;
+import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
 import br.dev.jstec.tyginvestiment.models.Stock;
-import br.dev.jstec.tyginvestiment.models.StockQuotation;
-import br.dev.jstec.tyginvestiment.repository.StockQuotationRepository;
 import br.dev.jstec.tyginvestiment.repository.StockRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +24,11 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
 
     private final AssetMapper mapper;
     private final StockRepository stockRepository;
-    private final StockQuotationRepository stockQuotationRepository;
     private final AlphaClient alphaClient;
+
+    private final AssetHistoryHandler assetHistoryHandler;
+
+    private final ApiKeyManager apiKeyManager;
 
     @Override
     @Transactional
@@ -42,11 +44,16 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
 
         var entitySaved = stockRepository.save(entity);
 
-        if(nonNull(entitySaved.getSymbol())) {
-            getAssetHistory(entitySaved);
+        if (nonNull(entitySaved.getSymbol())) {
+            assetHistoryHandler.getAssetHistory(entitySaved);
         }
 
         return mapper.toDto(entitySaved);
+    }
+
+    @Override
+    public StockDto save(String symbol, String currency) {
+        throw new UnsupportedOperationException("Stock does not have currency");
     }
 
     @Override
@@ -59,15 +66,15 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
 
     @Override
     public StockDto save(StockDto dto) {
-        return null;
+        throw new UnsupportedOperationException("Stock does not have currency");
     }
 
     @Transactional
     public AlphaVantageClient getAsset(String symbol) {
 
-        var asset = alphaClient.getAssetInfo(symbol);
+        var asset = alphaClient.getAssetInfo(symbol, apiKeyManager.getAvailableApiKey());
 
-        if (nonNull(asset.getInformation()) ) {
+        if (nonNull(asset.getInformation())) {
             throw new RuntimeException(format("Error getting asset information with {0}", asset.getInformation()));
         }
         if (nonNull(asset.getErrorMessage())) {
@@ -79,37 +86,6 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
         }
 
         return asset;
-    }
-
-    private void getAssetHistory(Stock stock) {
-        var history = alphaClient.getAssetHistory(stock.getSymbol());
-
-        if (nonNull(history.getInformation())) {
-            throw new RuntimeException(format("Error getting asset history with {0}", history.getInformation()));
-        }
-        if (nonNull(history.getErrorMessage())) {
-            throw new RuntimeException(format("Error getting asset history with {0}", history.getErrorMessage()));
-        }
-
-        if (history.getTimeSeriesDaily().isEmpty()) {
-            throw new RuntimeException("Asset History not found");
-        }
-
-        var quotations = history.getTimeSeriesDaily().entrySet().stream()
-                .map(entry -> {
-                    var quotation = new StockQuotation();
-                    quotation.setStock(stock);
-                    quotation.setDate(entry.getKey());
-                    quotation.setOpen(entry.getValue().getOpen());
-                    quotation.setHigh(entry.getValue().getHigh());
-                    quotation.setLow(entry.getValue().getLow());
-                    quotation.setClose(entry.getValue().getClose());
-                    quotation.setVolume(entry.getValue().getVolume());
-                    return quotation;
-                })
-                .toList();
-
-        stockQuotationRepository.saveAllAndFlush(quotations);
     }
 
 }

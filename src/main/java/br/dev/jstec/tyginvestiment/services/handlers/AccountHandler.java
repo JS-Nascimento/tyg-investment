@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -39,7 +40,6 @@ public class AccountHandler {
     @Transactional(readOnly = true)
     public AccountDto findById(Long id) {
         var account = accountRepository.findById(id).orElse(null);
-
         return mapper.toDto(account);
     }
 
@@ -74,6 +74,7 @@ public class AccountHandler {
 
                     var totalInvested = overview.stream()
                             .map(PortfolioOverviewDto::getValue)
+                            .filter(Objects::nonNull)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                     return new InvestmentDto(type, overview, totalInvested);

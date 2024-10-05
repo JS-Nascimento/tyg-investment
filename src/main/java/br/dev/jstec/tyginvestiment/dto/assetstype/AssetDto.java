@@ -15,7 +15,9 @@ import lombok.NoArgsConstructor;
         property = "@type"
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = StockDto.class, name = "STOCK")
+        @JsonSubTypes.Type(value = StockDto.class, name = "STOCK"),
+        @JsonSubTypes.Type(value = FundDto.class, name = "FUND"),
+        @JsonSubTypes.Type(value = CriptoDto.class, name = "CRIPTO"),
 })
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class AssetDto {
