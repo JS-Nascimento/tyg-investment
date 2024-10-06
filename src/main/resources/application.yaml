@@ -42,13 +42,6 @@ server:
 #
 #
 
-feign:
-  client:
-    config:
-      default:
-        connectTimeout: 50000
-        readTimeout: 50000
-
 logging:
   level:
     org:
@@ -94,8 +87,6 @@ coin-gecko:
   api-key: ${COIN_GECKO_API_KEY}
   time-to-historic: 30
   base-url: https://api.coingecko.com/api/v3
-  get-coin-list: /coins/list
-  get-coin-info: /coins/{id}
   get-coin-simple-price: /simple/price?ids={ids}&vs_currencies={vs_currencies}&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true&include_last_updated_at=true&precision=${app.config.decimal-places}
   get-coin-market-data: /coins/markets?vs_currency={vs_currency}&ids={ids}&sparkline=false&price_change_percentage=14d&precision=${app.config.decimal-places}
   get-coin-time-series: /coins/{id}/market_chart?vs_currency={vs_currency}&days=${coin-gecko.time-to-historic}&interval=daily&precision=${app.config.decimal-places}
