@@ -1,9 +1,12 @@
 package br.dev.jstec.tyginvestiment.services.mappers;
 
 import br.dev.jstec.tyginvestiment.dto.AccountHoldingDto;
+import br.dev.jstec.tyginvestiment.dto.assetstype.CryptoDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
 import br.dev.jstec.tyginvestiment.models.AccountHolding;
+import br.dev.jstec.tyginvestiment.models.Crypto;
+import br.dev.jstec.tyginvestiment.models.Fund;
 import br.dev.jstec.tyginvestiment.models.Stock;
 import org.mapstruct.Mapper;
 import org.mapstruct.ObjectFactory;
@@ -35,6 +38,9 @@ public abstract class AccountHoldingMapper {
             accountHolding.setAsset(assetMapper.toEntity(fundDto));
         }
 
+        if (dto.getAsset() instanceof CryptoDto cryptoDto) {
+            accountHolding.setAsset(assetMapper.toEntity(cryptoDto));
+        }
 
         accountHolding.setInitialQuantity(dto.getInitialQuantity());
         accountHolding.setQuantity(dto.getQuantity());
@@ -54,8 +60,16 @@ public abstract class AccountHoldingMapper {
 
         accountHoldingDto.setId(entity.getId());
 
-        if (entity.getAsset() != null && entity.getAsset() instanceof Stock stock) {
-            accountHoldingDto.setAsset(assetMapper.toDtoSimplified(stock));
+        if (entity.getAsset() != null && entity.getAsset() instanceof Stock asset) {
+            accountHoldingDto.setAsset(assetMapper.toDtoSimplified(asset));
+        }
+
+        if (entity.getAsset() != null && entity.getAsset() instanceof Fund asset) {
+            accountHoldingDto.setAsset(assetMapper.toDtoSimplified(asset));
+        }
+
+        if (entity.getAsset() != null && entity.getAsset() instanceof Crypto asset) {
+            accountHoldingDto.setAsset(assetMapper.toDtoSimplified(asset));
         }
 
         accountHoldingDto.setInitialQuantity(entity.getInitialQuantity());

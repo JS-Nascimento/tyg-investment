@@ -18,12 +18,12 @@ public abstract class AssetQuotationMapper {
         }
 
         var quotation = new StockQuotation();
-        quotation.setStock(asset);
+        quotation.setAsset(asset);
         quotation.setOpen(globalQuoteDto.getOpen());
         quotation.setHigh(globalQuoteDto.getHigh());
         quotation.setLow(globalQuoteDto.getLow());
         quotation.setClose(globalQuoteDto.getPrice());
-        quotation.setVolume(globalQuoteDto.getVolume());
+        quotation.setVolume(Double.valueOf(globalQuoteDto.getVolume()));
         quotation.setDate(globalQuoteDto.getLatestTradingDay());
         quotation.setPreviousClose(globalQuoteDto.getPreviousClose());
         quotation.setChange(globalQuoteDto.getChange());

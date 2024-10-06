@@ -1,12 +1,20 @@
 package br.dev.jstec.tyginvestiment.clients.dto;
 
+import br.dev.jstec.tyginvestiment.enums.AssetType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
 
 @Data
-public class CoinGekcoCriptoDto {
+public class CoinGeckoCriptoDto {
+
+    private AssetType assetType;
+
+    private String description;
+
+    private String currency;
 
     @JsonProperty("id")
     private String id;
@@ -80,7 +88,7 @@ public class CoinGekcoCriptoDto {
     @JsonProperty("atl_date")
     private ZonedDateTime atlDate;
 
-    @JsonProperty("roi")
+    @JsonIgnore
     private String roi;
 
     @JsonProperty("last_updated")

@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class CriptoDto extends AssetDto {
+public class CryptoDto extends AssetDto {
 
     private String id;
     private String image;
@@ -33,7 +33,6 @@ public class CriptoDto extends AssetDto {
     private Double atl;
     private Double atlChangePercentage;
     private ZonedDateTime atlDate;
-    private String roi;
     private ZonedDateTime lastUpdated;
     private Double priceChangePercentage14dInCurrency;
 }

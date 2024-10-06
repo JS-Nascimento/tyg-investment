@@ -16,6 +16,13 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      feign:
+        client:
+          config:
+            default:
+              connectTimeout: 5000
+              readTimeout: 60000
+
 
 server:
   servlet:
@@ -78,3 +85,12 @@ currency-layer:
 
 exchangerate:
   base-url: https://v6.exchangerate-api.com/v6/${EXCHANGE_API_KEY}/latest/${app.config.currency-base}
+
+coin-gecko:
+  api-key: ${COIN_GECKO_API_KEY}
+  time-to-historic: 30
+  base-url: https://api.coingecko.com/api/v3
+  get-coin-list: /coins/list
+  get-coin-info: /coins/{id}
+  get-coin-market-data: /coins/markets?vs_currency={vs_currency}&ids={ids}&sparkline=false&price_change_percentage=14d&precision=${app.config.decimal-places}
+  get-coin-time-series: /coins/{id}/market_chart?vs_currency={vs_currency}&days=${coin-gecko.time-to-historic}&interval=daily&precision=${app.config.decimal-places}

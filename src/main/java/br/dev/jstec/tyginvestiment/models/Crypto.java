@@ -12,9 +12,9 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @Entity
 @EqualsAndHashCode(callSuper = true)
-public class Cripto extends Asset {
+public class Crypto extends Asset {
 
-    @Column(name = "crypto_id")
+    @Column(name = "id")
     private String id;
 
     @Column(name = "image")
@@ -79,9 +79,6 @@ public class Cripto extends Asset {
 
     @Column(name = "atl_date")
     private ZonedDateTime atlDate;
-
-    @Column(name = "roi")
-    private String roi;
 
     @Column(name = "last_updated")
     private ZonedDateTime lastUpdated;

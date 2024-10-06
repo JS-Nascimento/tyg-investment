@@ -1,7 +1,9 @@
 package br.dev.jstec.tyginvestiment.controllers;
 
+import br.dev.jstec.tyginvestiment.dto.assetstype.CryptoDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
+import br.dev.jstec.tyginvestiment.services.handlers.CryptoHandler;
 import br.dev.jstec.tyginvestiment.services.handlers.FundHandler;
 import br.dev.jstec.tyginvestiment.services.handlers.StockHandler;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class AssetController {
 
     private final StockHandler handler;
     private final FundHandler fundHandler;
+    private final CryptoHandler cryptoHandler;
 
     @PostMapping("/stocks")
     public ResponseEntity<StockDto> saveAsset(@RequestParam String symbol) {
@@ -33,6 +36,14 @@ public class AssetController {
     public ResponseEntity<FundDto> saveAsset(@RequestParam String symbol, @RequestParam String currency) {
 
         var asset = fundHandler.save(symbol.toUpperCase(), currency);
+
+        return ResponseEntity.status(201).body(asset);
+    }
+
+    @PostMapping("/cryptos")
+    public ResponseEntity<CryptoDto> saveCrypto(@RequestParam String symbol, @RequestParam String currency) {
+
+        var asset = cryptoHandler.save(symbol.toUpperCase(), currency);
 
         return ResponseEntity.status(201).body(asset);
     }
