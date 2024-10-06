@@ -91,7 +91,7 @@ public class CryptoHandler implements AssetHandler<Crypto, CryptoDto> {
     @Transactional
     public CoinGeckoCriptoDto getAsset(String id, String currency) {
 
-        var asset = geckoCoinClient.getCriptoMarketData(id.toLowerCase(), currency);
+        var asset = geckoCoinClient.getCryptoMarketData(id.toLowerCase(), currency);
 
         if (isNull(asset) || asset.isEmpty()) {
             throw new RuntimeException("Cripto not found");

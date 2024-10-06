@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Cascade;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static org.hibernate.annotations.CascadeType.ALL;
@@ -30,7 +30,7 @@ public class StockQuotation {
     @Cascade(ALL)
     private Asset asset;
 
-    private LocalDate date;
+    private LocalDateTime date;
 
     private BigDecimal open;
 

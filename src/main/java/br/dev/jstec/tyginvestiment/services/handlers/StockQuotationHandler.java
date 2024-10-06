@@ -1,7 +1,9 @@
 package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.clients.AlphaClient;
+import br.dev.jstec.tyginvestiment.clients.GeckoCoinClient;
 import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
+import br.dev.jstec.tyginvestiment.enums.AssetType;
 import br.dev.jstec.tyginvestiment.models.Asset;
 import br.dev.jstec.tyginvestiment.repository.AssetRepository;
 import br.dev.jstec.tyginvestiment.repository.StockQuotationRepository;
@@ -21,6 +23,7 @@ public class StockQuotationHandler {
     private final StockQuotationRepository stockQuotationRepository;
     private final AssetRepository assetRepository;
     private final AlphaClient alphaClient;
+    private final GeckoCoinClient geckoClient;
     private final AssetQuotationMapper mapper;
     private final ApiKeyManager apiKeyManager;
 
@@ -30,15 +33,24 @@ public class StockQuotationHandler {
         Set<Asset> assets = assetRepository.findDistinctSymbols();
 
         assets.forEach(asset -> {
-            log.info("Atualizando cotação da ação {}", asset.getSymbol());
+            if (AssetType.CRYPTO.equals(asset.getAssetType())) {
+                log.info("Atualizando cotação da criptomoeda {}", asset.getSymbol());
 
-            var stockQuotation = alphaClient.getGlobalQuote(asset.getSymbol(), apiKeyManager.getAvailableApiKey());
+                var cryptoQuotation = geckoClient.getCryptoSimplePrice(asset.getName().toLowerCase(), asset.getCurrency());
 
-            if (stockQuotation != null) {
-                stockQuotationRepository.saveAndFlush(mapper.toStockQuotation(stockQuotation.getGlobalQuote(), asset));
-                log.info("Cotação da ação {} atualizada com sucesso", asset.getSymbol());
+                if (cryptoQuotation != null) {
+                    stockQuotationRepository.saveAndFlush(mapper.toCryptoQuotation(cryptoQuotation, asset));
+                    log.info("Cotação da criptomoeda {} atualizada com sucesso", asset.getSymbol());
+                }
+            } else {
+                log.info("Atualizando cotação da ação {}", asset.getSymbol());
+
+                var stockQuotation = alphaClient.getGlobalQuote(asset.getSymbol(), apiKeyManager.getAvailableApiKey());
+                if (stockQuotation != null) {
+                    stockQuotationRepository.saveAndFlush(mapper.toStockQuotation(stockQuotation.getGlobalQuote(), asset));
+                    log.info("Cotação da ação {} atualizada com sucesso", asset.getSymbol());
+                }
             }
-            ;
         });
     }
 }

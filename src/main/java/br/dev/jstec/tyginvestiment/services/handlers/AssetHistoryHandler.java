@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class AssetHistoryHandler {
                 .map(entry -> {
                     var quotation = new StockQuotation();
                     quotation.setAsset(asset);
-                    quotation.setDate(entry.getKey());
+                    quotation.setDate(entry.getKey().atTime(LocalTime.now()));
                     quotation.setOpen(entry.getValue().getOpen());
                     quotation.setHigh(entry.getValue().getHigh());
                     quotation.setLow(entry.getValue().getLow());
@@ -71,12 +72,12 @@ public class AssetHistoryHandler {
         return CompletableFuture.completedFuture(null);
     }
 
-    //    @Async("taskExecutor")
-    public void getCryptoHistory(Asset asset) {
+    @Async("taskExecutor")
+    public CompletableFuture<Void> getCryptoHistory(Asset asset) {
 
         log.info("Getting asset history for {}", asset.getSymbol());
 
-        var history = geckoCoinClient.getCriptoTimeSeries(asset.getName().toLowerCase(), asset.getCurrency());
+        var history = geckoCoinClient.getCryptoTimeSeries(asset.getName().toLowerCase(), asset.getCurrency());
 
         if (history.getPrices().isEmpty()) {
             throw new RuntimeException("Crypto History not found");
@@ -89,7 +90,7 @@ public class AssetHistoryHandler {
             quotation.setAsset(asset);
             quotation.setDate(Instant.ofEpochMilli(history.getPrices().get(i).getTimestamp())
                     .atZone(ZoneId.systemDefault())
-                    .toLocalDate());
+                    .toLocalDateTime());
             quotation.setOpen(BigDecimal.valueOf(history.getPrices().get(i).getValue()));
             quotation.setHigh(BigDecimal.valueOf(history.getPrices().get(i).getValue()));
             quotation.setLow(BigDecimal.valueOf(history.getPrices().get(i).getValue()));
@@ -103,6 +104,6 @@ public class AssetHistoryHandler {
 
         log.info("Crypto history saved for {}", asset.getSymbol());
 
-        CompletableFuture.completedFuture(null);
+        return CompletableFuture.completedFuture(null);
     }
 }

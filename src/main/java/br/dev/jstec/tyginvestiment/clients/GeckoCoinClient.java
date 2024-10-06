@@ -1,6 +1,7 @@
 package br.dev.jstec.tyginvestiment.clients;
 
 import br.dev.jstec.tyginvestiment.clients.dto.CoinGeckoCriptoDto;
+import br.dev.jstec.tyginvestiment.clients.dto.GeckoSimplePriceDto;
 import br.dev.jstec.tyginvestiment.clients.dto.GeckoTimeSeriesDto;
 import feign.Feign;
 import feign.Logger;
@@ -21,13 +22,19 @@ public interface GeckoCoinClient {
 
     @GetMapping("${coin-gecko.get-coin-market-data}")
     @Cacheable("crypto-market-data")
-    List<CoinGeckoCriptoDto> getCriptoMarketData(@RequestParam("ids") String ids,
+    List<CoinGeckoCriptoDto> getCryptoMarketData(@RequestParam("ids") String ids,
                                                  @RequestParam("vs_currency") String vsCurrency);
 
     @GetMapping("${coin-gecko.get-coin-time-series}")
     @Cacheable("crypto-time-series")
-    GeckoTimeSeriesDto getCriptoTimeSeries(@PathVariable("id") String id,
+    GeckoTimeSeriesDto getCryptoTimeSeries(@PathVariable("id") String id,
                                            @RequestParam("vs_currency") String vsCurrency);
+
+    @GetMapping("${coin-gecko.get-coin-simple-price}")
+    @Cacheable("crypto-time-series")
+    GeckoSimplePriceDto getCryptoSimplePrice(@RequestParam("ids") String ids,
+                                             @RequestParam("vs_currencies") String vsCurrencies);
+
 
     class GekcoCoinClientConfig {
 
