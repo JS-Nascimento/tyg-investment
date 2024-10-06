@@ -2,10 +2,11 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.clients.GeckoCoinClient;
 import br.dev.jstec.tyginvestiment.clients.dto.CoinGeckoCriptoDto;
-import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.CryptoDto;
 import br.dev.jstec.tyginvestiment.enums.AssetType;
 import br.dev.jstec.tyginvestiment.events.AssetSavedEvent;
+import br.dev.jstec.tyginvestiment.exception.ErrorMessage;
+import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.models.Crypto;
 import br.dev.jstec.tyginvestiment.repository.CryptoRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
@@ -15,8 +16,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Currency;
-
+import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ASSET_NOT_FOUND;
+import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ATTRIBUTE_NOT_FOUND;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -38,32 +39,22 @@ public class CryptoHandler implements AssetHandler<Crypto, CryptoDto> {
     public CryptoDto save(String name, String currency) {
 
         if (isBlank(name)) {
-            throw new RuntimeException("Name is required");
+            throw new InfrastructureException(ATTRIBUTE_NOT_FOUND, "NOME");
         }
 
         var asset = getAsset(name, currency);
 
         if (isNull(asset)) {
-            throw new RuntimeException("Crypto not found");
+            throw new InfrastructureException(ASSET_NOT_FOUND, name);
         }
 
-        if (!currencyHandler.exists(currency)) {
-            var newCurrency = Currency.getInstance(currency);
-            var currencyDto = new CurrencyDto();
-            currencyDto.setCode(newCurrency.getCurrencyCode());
-            currencyDto.setName(newCurrency.getDisplayName());
-            currencyDto.setSymbol(newCurrency.getSymbol());
-            currencyDto.setDecimalPlaces(currencyHandler.getDecimalPlaces());
-            currencyDto.setCurrencyBase(false);
-
-            currencyHandler.saveCurrency(currencyDto);
-        }
+        currencyHandler.verifyAndSaveIfNotExists(currency);
 
         completeCryptoInfo(asset, currency);
 
         var entity = mapper.toEntity(asset);
 
-        var entitySaved = cryptoRepository.saveAndFlush(entity);
+        var entitySaved = cryptoRepository.save(entity);
 
         if (nonNull(entitySaved.getId())) {
             publisher.publishEvent(new AssetSavedEvent(this, entitySaved));
@@ -77,7 +68,7 @@ public class CryptoHandler implements AssetHandler<Crypto, CryptoDto> {
     public CryptoDto findById(String symbol) {
         return cryptoRepository.findById(symbol)
                 .map(mapper::toDto)
-                .orElse(null);
+                .orElseThrow(() -> new InfrastructureException(ErrorMessage.ASSET_NOT_FOUND, symbol));
     }
 
     @Override
@@ -96,7 +87,7 @@ public class CryptoHandler implements AssetHandler<Crypto, CryptoDto> {
         var asset = geckoCoinClient.getCryptoMarketData(id.toLowerCase(), currency);
 
         if (isNull(asset) || asset.isEmpty()) {
-            throw new RuntimeException("Cripto not found");
+            throw new InfrastructureException(ASSET_NOT_FOUND, id);
         }
 
         return asset.getFirst();

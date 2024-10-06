@@ -102,4 +102,19 @@ public class CurrencyHandler {
             throw new IllegalArgumentException("Invalid currency data");
         }
     }
+
+    @Transactional
+    public void verifyAndSaveIfNotExists(String code) {
+        if (!exists(code)) {
+            var currency = Currency.getInstance(code);
+            var currencyDto = new CurrencyDto();
+            currencyDto.setCode(currency.getCurrencyCode());
+            currencyDto.setName(currency.getDisplayName());
+            currencyDto.setSymbol(currency.getSymbol());
+            currencyDto.setDecimalPlaces(decimalPlaces);
+            currencyDto.setCurrencyBase(false);
+
+            saveCurrency(currencyDto);
+        }
+    }
 }

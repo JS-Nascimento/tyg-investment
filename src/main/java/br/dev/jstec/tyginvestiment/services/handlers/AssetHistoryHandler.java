@@ -3,6 +3,7 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 import br.dev.jstec.tyginvestiment.clients.AlphaClient;
 import br.dev.jstec.tyginvestiment.clients.GeckoCoinClient;
 import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
+import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.models.StockQuotation;
 import br.dev.jstec.tyginvestiment.repository.AssetRepository;
 import br.dev.jstec.tyginvestiment.repository.StockQuotationRepository;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ASSET_NOT_FOUND;
 import static java.text.MessageFormat.format;
 import static java.util.Objects.nonNull;
 
@@ -83,12 +85,12 @@ public class AssetHistoryHandler {
         log.info("Getting asset history for {}", symbol);
 
         var asset = assetRepository.findBySymbol(symbol)
-                .orElseThrow(() -> new RuntimeException("Asset not found"));
+                .orElseThrow(() -> new InfrastructureException(ASSET_NOT_FOUND, symbol));
 
         var history = geckoCoinClient.getCryptoTimeSeries(name.toLowerCase(), currency);
 
         if (history.getPrices().isEmpty()) {
-            throw new RuntimeException("Crypto History not found");
+            throw new InfrastructureException(ASSET_NOT_FOUND, symbol);
         }
 
         List<StockQuotation> quotations = new ArrayList<>();

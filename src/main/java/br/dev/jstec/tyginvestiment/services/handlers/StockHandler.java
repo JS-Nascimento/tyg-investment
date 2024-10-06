@@ -5,6 +5,7 @@ import br.dev.jstec.tyginvestiment.clients.dto.AlphaVantageClient;
 import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
 import br.dev.jstec.tyginvestiment.events.AssetSavedEvent;
+import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.models.Stock;
 import br.dev.jstec.tyginvestiment.repository.StockRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
@@ -14,7 +15,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import static java.text.MessageFormat.format;
+import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ASSET_NOT_FOUND;
+import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ATTRIBUTE_NOT_FOUND;
+import static br.dev.jstec.tyginvestiment.services.validators.AssetBussinessRulesValidator.validateClientApiResponse;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -38,10 +41,14 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
     public StockDto save(String symbol) {
 
         if (isBlank(symbol)) {
-            throw new RuntimeException("Symbol is required");
+            throw new InfrastructureException(ATTRIBUTE_NOT_FOUND, symbol);
         }
 
         var asset = getAsset(symbol);
+
+        if (isNull(asset)) {
+            throw new InfrastructureException(ASSET_NOT_FOUND, symbol);
+        }
 
         var entity = mapper.toEntity(asset);
 
@@ -64,7 +71,7 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
     public StockDto findById(String symbol) {
         return stockRepository.findById(symbol)
                 .map(mapper::toDto)
-                .orElse(null);
+                .orElseThrow(() -> new InfrastructureException(ASSET_NOT_FOUND, symbol));
     }
 
     @Override
@@ -77,15 +84,10 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
 
         var asset = alphaClient.getAssetInfo(symbol, apiKeyManager.getAvailableApiKey());
 
-        if (nonNull(asset.getInformation())) {
-            throw new RuntimeException(format("Error getting asset information with {0}", asset.getInformation()));
-        }
-        if (nonNull(asset.getErrorMessage())) {
-            throw new RuntimeException(format("Error getting asset information with {0}", asset.getErrorMessage()));
-        }
+        validateClientApiResponse(asset);
 
         if (isNull(asset) || isBlank(asset.getSymbol())) {
-            throw new RuntimeException("Asset not found");
+            throw new InfrastructureException(ASSET_NOT_FOUND, symbol);
         }
 
         return asset;

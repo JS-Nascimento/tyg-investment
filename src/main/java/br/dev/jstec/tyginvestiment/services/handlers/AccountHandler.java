@@ -4,6 +4,8 @@ import br.dev.jstec.tyginvestiment.dto.AccountDto;
 import br.dev.jstec.tyginvestiment.dto.accountsummary.InvestmentDto;
 import br.dev.jstec.tyginvestiment.dto.accountsummary.InvestmentSummaryStatementDto;
 import br.dev.jstec.tyginvestiment.dto.accountsummary.PortfolioOverviewDto;
+import br.dev.jstec.tyginvestiment.exception.ErrorMessage;
+import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.repository.AccountHoldingRepository;
 import br.dev.jstec.tyginvestiment.repository.AccountRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AccountMapper;
@@ -39,7 +41,9 @@ public class AccountHandler {
 
     @Transactional(readOnly = true)
     public AccountDto findById(Long id) {
-        var account = accountRepository.findById(id).orElse(null);
+        var account = accountRepository
+                .findById(id)
+                .orElseThrow(() -> new InfrastructureException(ErrorMessage.ACCOUNT_NOT_FOUND, String.valueOf(id)));
         return mapper.toDto(account);
     }
 

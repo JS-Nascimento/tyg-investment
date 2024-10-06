@@ -3,10 +3,10 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 import br.dev.jstec.tyginvestiment.clients.AlphaClient;
 import br.dev.jstec.tyginvestiment.clients.dto.EtfProfileDto;
 import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
-import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
 import br.dev.jstec.tyginvestiment.enums.AssetType;
 import br.dev.jstec.tyginvestiment.events.AssetSavedEvent;
+import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.models.Fund;
 import br.dev.jstec.tyginvestiment.repository.FundRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
@@ -16,9 +16,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Currency;
-
-import static java.text.MessageFormat.format;
+import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ASSET_NOT_FOUND;
+import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ATTRIBUTE_NOT_FOUND;
+import static br.dev.jstec.tyginvestiment.services.validators.AssetBussinessRulesValidator.validateClientApiResponse;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -43,26 +43,20 @@ public class FundHandler implements AssetHandler<Fund, FundDto> {
     public FundDto save(String symbol, String currency) {
 
         if (isBlank(symbol)) {
-            throw new RuntimeException("Symbol is required");
+            throw new InfrastructureException(ATTRIBUTE_NOT_FOUND, "SIMBOLO");
+        }
+
+        if (isBlank(currency)) {
+            throw new InfrastructureException(ATTRIBUTE_NOT_FOUND, "MOEDA");
         }
 
         var asset = getAsset(symbol);
 
         if (isNull(asset)) {
-            throw new RuntimeException("ETF not found");
+            throw new InfrastructureException(ASSET_NOT_FOUND, symbol);
         }
 
-        if (!currencyHandler.exists(currency)) {
-            var newCurrency = Currency.getInstance(currency);
-            var currencyDto = new CurrencyDto();
-            currencyDto.setCode(newCurrency.getCurrencyCode());
-            currencyDto.setName(newCurrency.getDisplayName());
-            currencyDto.setSymbol(newCurrency.getSymbol());
-            currencyDto.setDecimalPlaces(currencyHandler.getDecimalPlaces());
-            currencyDto.setCurrencyBase(false);
-
-            currencyHandler.saveCurrency(currencyDto);
-        }
+        currencyHandler.verifyAndSaveIfNotExists(currency);
 
         completeFundInfo(asset, symbol, currency);
 
@@ -72,7 +66,6 @@ public class FundHandler implements AssetHandler<Fund, FundDto> {
 
         if (nonNull(entitySaved.getSymbol())) {
             publisher.publishEvent(new AssetSavedEvent(this, entitySaved));
-            // assetHistoryHandler.getAssetHistory(entitySaved);
         }
 
         return mapper.toDto(entitySaved);
@@ -83,7 +76,7 @@ public class FundHandler implements AssetHandler<Fund, FundDto> {
     public FundDto findById(String symbol) {
         return fundRepository.findById(symbol)
                 .map(mapper::toDto)
-                .orElse(null);
+                .orElseThrow(() -> new InfrastructureException(ASSET_NOT_FOUND, symbol));
     }
 
     @Override
@@ -101,15 +94,10 @@ public class FundHandler implements AssetHandler<Fund, FundDto> {
 
         var asset = alphaClient.getEtfProfile(symbol, apiKeyManager.getAvailableApiKey());
 
-        if (nonNull(asset.getInformation())) {
-            throw new RuntimeException(format("Error getting asset information with {0}", asset.getInformation()));
-        }
-        if (nonNull(asset.getErrorMessage())) {
-            throw new RuntimeException(format("Error getting asset information with {0}", asset.getErrorMessage()));
-        }
+        validateClientApiResponse(asset);
 
-        if (isNull(asset)) {
-            throw new RuntimeException("ETF not found");
+        if (isNull(asset) || isBlank(asset.getSymbol())) {
+            throw new InfrastructureException(ASSET_NOT_FOUND, symbol);
         }
 
         return asset;

@@ -2,6 +2,7 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 
 
 import br.dev.jstec.tyginvestiment.dto.ConversionRateDto;
+import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.models.ConversionRate;
 import br.dev.jstec.tyginvestiment.models.Currency;
 import br.dev.jstec.tyginvestiment.repository.ConversionRatesRepository;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+
+import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.INVALID_CONVERSION_RATE;
 
 @Component
 @RequiredArgsConstructor
@@ -30,7 +33,7 @@ public class ConversionRateHandler {
         var rate = response.getConversionRates().get(currency.getCode());
 
         if (rate == null) {
-            throw new IllegalArgumentException("Invalid conversion rate");
+            throw new InfrastructureException(INVALID_CONVERSION_RATE, currency.getCode());
         }
 
         var entity = new ConversionRate();
@@ -46,7 +49,7 @@ public class ConversionRateHandler {
     public ConversionRateDto findLastRateToConversion(String sourceCurrency, Long targetCurrencyId) {
         return conversionRatesRepository.findLastConversionRate(sourceCurrency, targetCurrencyId)
                 .map(cr -> new ConversionRateDto(cr.getRate(), cr.getRateDate()))
-                .orElse(null);
+                .orElseThrow(() -> new InfrastructureException(INVALID_CONVERSION_RATE, sourceCurrency));
     }
 
     @Transactional
