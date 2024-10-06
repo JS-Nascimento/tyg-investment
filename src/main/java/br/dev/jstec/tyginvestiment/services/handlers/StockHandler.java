@@ -4,11 +4,13 @@ import br.dev.jstec.tyginvestiment.clients.AlphaClient;
 import br.dev.jstec.tyginvestiment.clients.dto.AlphaVantageClient;
 import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
+import br.dev.jstec.tyginvestiment.events.AssetSavedEvent;
 import br.dev.jstec.tyginvestiment.models.Stock;
 import br.dev.jstec.tyginvestiment.repository.StockRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
     private final AssetMapper mapper;
     private final StockRepository stockRepository;
     private final AlphaClient alphaClient;
+    private final ApplicationEventPublisher publisher;
 
     private final AssetHistoryHandler assetHistoryHandler;
 
@@ -45,7 +48,7 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
         var entitySaved = stockRepository.save(entity);
 
         if (nonNull(entitySaved.getSymbol())) {
-            assetHistoryHandler.getAssetHistory(entitySaved);
+            publisher.publishEvent(new AssetSavedEvent(this, entitySaved));
         }
 
         return mapper.toDto(entitySaved);

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cascade;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ import static org.hibernate.annotations.CascadeType.ALL;
 @Table(indexes = {
         @Index(name = "idx_data", columnList = "date"),
 })
+@BatchSize(size = 50)
 public class StockQuotation {
 
     @Id

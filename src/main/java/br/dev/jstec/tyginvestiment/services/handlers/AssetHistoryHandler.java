@@ -3,13 +3,14 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 import br.dev.jstec.tyginvestiment.clients.AlphaClient;
 import br.dev.jstec.tyginvestiment.clients.GeckoCoinClient;
 import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
-import br.dev.jstec.tyginvestiment.models.Asset;
 import br.dev.jstec.tyginvestiment.models.StockQuotation;
+import br.dev.jstec.tyginvestiment.repository.AssetRepository;
 import br.dev.jstec.tyginvestiment.repository.StockQuotationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -30,13 +31,17 @@ public class AssetHistoryHandler {
     private final AlphaClient alphaClient;
     private final GeckoCoinClient geckoCoinClient;
     private final StockQuotationRepository stockQuotationRepository;
+    private final AssetRepository assetRepository;
 
     private final ApiKeyManager apiKeyManager;
 
-    @Async("taskExecutor")
-    public CompletableFuture<Void> getAssetHistory(Asset asset) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public CompletableFuture<Void> getAssetHistory(String symbol) {
 
-        log.info("Getting asset history for {}", asset.getSymbol());
+        log.info("Getting asset history for {}", symbol);
+
+        var asset = assetRepository.findBySymbol(symbol)
+                .orElseThrow(() -> new RuntimeException("Asset not found"));
 
         var history = alphaClient.getAssetHistory(asset.getSymbol(), apiKeyManager.getAvailableApiKey());
 
@@ -65,19 +70,22 @@ public class AssetHistoryHandler {
                 })
                 .toList();
 
-        stockQuotationRepository.saveAllAndFlush(quotations);
+        stockQuotationRepository.saveAll(quotations);
 
         log.info("Asset history saved for {}", asset.getSymbol());
 
         return CompletableFuture.completedFuture(null);
     }
 
-    @Async("taskExecutor")
-    public CompletableFuture<Void> getCryptoHistory(Asset asset) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public CompletableFuture<Void> getCryptoHistory(String symbol, String name, String currency) {
 
-        log.info("Getting asset history for {}", asset.getSymbol());
+        log.info("Getting asset history for {}", symbol);
 
-        var history = geckoCoinClient.getCryptoTimeSeries(asset.getName().toLowerCase(), asset.getCurrency());
+        var asset = assetRepository.findBySymbol(symbol)
+                .orElseThrow(() -> new RuntimeException("Asset not found"));
+
+        var history = geckoCoinClient.getCryptoTimeSeries(name.toLowerCase(), currency);
 
         if (history.getPrices().isEmpty()) {
             throw new RuntimeException("Crypto History not found");
@@ -100,7 +108,7 @@ public class AssetHistoryHandler {
             quotations.add(quotation);
         }
 
-        stockQuotationRepository.saveAllAndFlush(quotations);
+        stockQuotationRepository.saveAll(quotations);
 
         log.info("Crypto history saved for {}", asset.getSymbol());
 

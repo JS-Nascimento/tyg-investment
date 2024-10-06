@@ -6,11 +6,13 @@ import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
 import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
 import br.dev.jstec.tyginvestiment.enums.AssetType;
+import br.dev.jstec.tyginvestiment.events.AssetSavedEvent;
 import br.dev.jstec.tyginvestiment.models.Fund;
 import br.dev.jstec.tyginvestiment.repository.FundRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +34,11 @@ public class FundHandler implements AssetHandler<Fund, FundDto> {
     private final CurrencyHandler currencyHandler;
     private final AssetHistoryHandler assetHistoryHandler;
 
+    private final ApplicationEventPublisher publisher;
+
     private final ApiKeyManager apiKeyManager;
 
-    @Transactional
+    @Transactional(timeout = 300)
     @Override
     public FundDto save(String symbol, String currency) {
 
@@ -67,7 +71,8 @@ public class FundHandler implements AssetHandler<Fund, FundDto> {
         var entitySaved = fundRepository.save(entity);
 
         if (nonNull(entitySaved.getSymbol())) {
-            assetHistoryHandler.getAssetHistory(entitySaved);
+            publisher.publishEvent(new AssetSavedEvent(this, entitySaved));
+            // assetHistoryHandler.getAssetHistory(entitySaved);
         }
 
         return mapper.toDto(entitySaved);

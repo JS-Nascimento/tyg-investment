@@ -15,6 +15,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.time.LocalDate;
+
 @Mapper(componentModel = "spring")
 public abstract class AssetMapper {
 
@@ -31,6 +33,8 @@ public abstract class AssetMapper {
     public abstract Crypto toEntity(CoinGeckoCriptoDto dto);
 
     @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
+    @Mapping(target = "dividendDate", source = "dividendDate", qualifiedByName = "mapDateOrNull")
+    @Mapping(target = "exDividendDate", source = "exDividendDate", qualifiedByName = "mapDateOrNull")
     public abstract Stock toEntity(AlphaVantageClient dto);
 
     @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
@@ -72,4 +76,12 @@ public abstract class AssetMapper {
         return AssetType.isStock(assetType);
     }
 
+    @Named("mapDateOrNull")
+    public LocalDate mapDateOrNull(String date) {
+        try {
+            return LocalDate.parse(date);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

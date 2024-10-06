@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -35,11 +36,13 @@ public class Fund extends Asset {
     @Embedded
     private AssetAllocation assetAllocation;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "sectors", joinColumns = @JoinColumn(name = "fund_info_id"))
+    @BatchSize(size = 50)
     private List<Sector> sectors;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "holdings", joinColumns = @JoinColumn(name = "fund_info_id"))
+    @BatchSize(size = 50)
     private List<Holding> holdings;
 }

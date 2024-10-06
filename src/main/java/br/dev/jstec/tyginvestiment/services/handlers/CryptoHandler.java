@@ -5,11 +5,13 @@ import br.dev.jstec.tyginvestiment.clients.dto.CoinGeckoCriptoDto;
 import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.CryptoDto;
 import br.dev.jstec.tyginvestiment.enums.AssetType;
+import br.dev.jstec.tyginvestiment.events.AssetSavedEvent;
 import br.dev.jstec.tyginvestiment.models.Crypto;
 import br.dev.jstec.tyginvestiment.repository.CryptoRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +31,7 @@ public class CryptoHandler implements AssetHandler<Crypto, CryptoDto> {
     private final GeckoCoinClient geckoCoinClient;
     private final CurrencyHandler currencyHandler;
     private final AssetHistoryHandler assetHistoryHandler;
-
+    private final ApplicationEventPublisher publisher;
 
     @Transactional
     @Override
@@ -64,7 +66,7 @@ public class CryptoHandler implements AssetHandler<Crypto, CryptoDto> {
         var entitySaved = cryptoRepository.saveAndFlush(entity);
 
         if (nonNull(entitySaved.getId())) {
-            assetHistoryHandler.getCryptoHistory(entitySaved);
+            publisher.publishEvent(new AssetSavedEvent(this, entitySaved));
         }
 
         return mapper.toDto(entitySaved);

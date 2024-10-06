@@ -43,6 +43,7 @@ public class StockQuotationHandler {
                     log.info("Cotação da criptomoeda {} atualizada com sucesso", asset.getSymbol());
                 }
             } else {
+
                 log.info("Atualizando cotação da ação {}", asset.getSymbol());
 
                 var stockQuotation = alphaClient.getGlobalQuote(asset.getSymbol(), apiKeyManager.getAvailableApiKey());
