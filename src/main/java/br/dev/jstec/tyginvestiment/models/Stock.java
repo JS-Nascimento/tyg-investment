@@ -1,7 +1,6 @@
 package br.dev.jstec.tyginvestiment.models;
 
-import br.dev.jstec.tyginvestiment.enums.AssetType;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

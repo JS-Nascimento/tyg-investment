@@ -5,16 +5,25 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
-@Table(name = "users")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Table(name = "users",
+        indexes = {
+                @Index(name = "idx_tenant", columnList = "tenantId"),
+                @Index(name = "idx_email", columnList = "email")
+        })
 public class User extends Auditable<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, updatable = false, unique = true)
+    private UUID tenantId;
 
     @Column(nullable = false)
     private String name;
@@ -24,4 +33,11 @@ public class User extends Auditable<Long> {
 
     @Column(nullable = false)
     private String password;
+
+    @PrePersist
+    protected void onCreate() {
+        if (tenantId == null) {
+            tenantId = UUID.randomUUID();
+        }
+    }
 }
