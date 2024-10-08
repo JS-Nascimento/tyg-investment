@@ -7,5 +7,14 @@ public enum TransactionType {
     BUY,
     SELL,
     DIVIDEND,
-    OTHER
+    OTHER;
+
+    public static TransactionType fromString(String value) {
+        for (TransactionType type : TransactionType.values()) {
+            if (type.name().equalsIgnoreCase(value)) {
+                return type;
+            }
+        }
+        return null;
+    }
 }

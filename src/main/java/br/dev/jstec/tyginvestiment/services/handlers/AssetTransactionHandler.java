@@ -2,15 +2,23 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.dto.AssetTransactionDto;
 import br.dev.jstec.tyginvestiment.enums.TransactionType;
+import br.dev.jstec.tyginvestiment.events.AssetTransactionSavedEvent;
 import br.dev.jstec.tyginvestiment.exception.BusinessException;
+import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
+import br.dev.jstec.tyginvestiment.repository.AccountRepository;
+import br.dev.jstec.tyginvestiment.repository.AssetRepository;
 import br.dev.jstec.tyginvestiment.repository.AssetTransactionRepository;
+import br.dev.jstec.tyginvestiment.services.mappers.AssetTransactionMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
 import static br.dev.jstec.tyginvestiment.exception.BusinessErrorMessage.*;
+import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ACCOUNT_NOT_FOUND;
+import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ASSET_NOT_FOUND;
 import static java.util.Objects.isNull;
 
 @Component
@@ -18,7 +26,11 @@ import static java.util.Objects.isNull;
 @Slf4j
 public class AssetTransactionHandler {
 
-    private final AssetTransactionRepository assetTransactionRepository;
+    private final AssetTransactionRepository repository;
+    private final AssetRepository assetRepository;
+    private final AccountRepository accountRepository;
+    private final AssetTransactionMapper mapper;
+    private final ApplicationEventPublisher publisher;
 
     public AssetTransactionDto create(AssetTransactionDto assetTransactionDto) {
         log.info("Creating asset transaction: {}", assetTransactionDto);
@@ -27,7 +39,19 @@ public class AssetTransactionHandler {
 
         setDescription(assetTransactionDto);
 
-        return assetTransactionDto;
+        var asset = assetRepository.findBySymbol(assetTransactionDto.getAssetId())
+                .orElseThrow(() -> new InfrastructureException(ASSET_NOT_FOUND));
+
+        var account = accountRepository.findById(assetTransactionDto.getAccountId())
+                .orElseThrow(() -> new InfrastructureException(ACCOUNT_NOT_FOUND));
+
+        var entity = mapper.toEntity(assetTransactionDto, asset, account);
+
+        var transaction = repository.save(entity);
+
+        publisher.publishEvent(new AssetTransactionSavedEvent(this, transaction));
+
+        return mapper.toDto(transaction);
     }
 
     private void validateAssetTransaction(AssetTransactionDto assetTransactionDto) {

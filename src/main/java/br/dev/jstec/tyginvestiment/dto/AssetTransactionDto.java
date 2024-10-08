@@ -17,7 +17,7 @@ public class AssetTransactionDto {
     private LocalDate transactionDate;
     private Double quantity;
     private BigDecimal value;
-    private Long assetId;
+    private String assetId;
     private Long accountId;
     private Long createdBy;
     private LocalDateTime createdAt;
