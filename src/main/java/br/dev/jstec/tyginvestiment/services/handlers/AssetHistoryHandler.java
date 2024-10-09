@@ -4,6 +4,7 @@ import br.dev.jstec.tyginvestiment.clients.AlphaClient;
 import br.dev.jstec.tyginvestiment.clients.GeckoCoinClient;
 import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
 import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
+import br.dev.jstec.tyginvestiment.models.AssetTransaction;
 import br.dev.jstec.tyginvestiment.models.StockQuotation;
 import br.dev.jstec.tyginvestiment.repository.AssetRepository;
 import br.dev.jstec.tyginvestiment.repository.StockQuotationRepository;
@@ -115,5 +116,33 @@ public class AssetHistoryHandler {
         log.info("Crypto history saved for {}", asset.getSymbol());
 
         return CompletableFuture.completedFuture(null);
+    }
+
+    public void updateAssetBalance(AssetTransaction transaction) {
+        log.info("Updating asset balance for {}", transaction.getAsset().getSymbol());
+
+//        var asset =
+//
+//
+//        var transactionQuantity = transaction.getQuantity();
+//
+//        switch (transaction.getTransactionType()) {
+//            case BUY:
+//                balance = balance.add(transaction.getQuantity());
+//                break;
+//            case SELL:
+//                balance = balance.subtract(transaction.getQuantity());
+//                break;
+//            case DIVIDEND:
+//                balance = balance.add(transaction.getValue());
+//                break;
+//            case OTHER:
+//                break;
+//        }
+//
+//        asset.setBalance(balance);
+//        assetRepository.save(asset);
+
+        log.info("Asset balance updated for {}", transaction.getAsset().getSymbol());
     }
 }

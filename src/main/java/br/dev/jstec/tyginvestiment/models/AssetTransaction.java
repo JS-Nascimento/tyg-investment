@@ -15,8 +15,8 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "asset_transactions",
         indexes = {
-                @Index(name = "idx_asset_transactions_transaction_date", columnList = "transaction_date"),
-                @Index(name = "idx_asset_transactions_transaction_type", columnList = "transaction_type"),
+                @Index(name = "idx_asset_transactions_transaction_date", columnList = "transactiondate"),
+                @Index(name = "idx_asset_transactions_transaction_type", columnList = "transactiontype"),
                 @Index(name = "idx_asset_transactions_asset_id", columnList = "asset_id"),
                 @Index(name = "idx_asset_transactions_account_id", columnList = "account_id")
         })
@@ -36,8 +36,10 @@ public class AssetTransaction extends Auditable<Long> {
     @Column(nullable = false)
     private LocalDate transactionDate;
 
-    private Double quantity;
+    @Column(precision = 12, scale = 4, columnDefinition = "DECIMAL(12,4) DEFAULT 0.0000")
+    private BigDecimal quantity;
 
+    @Column(precision = 12, scale = 4, columnDefinition = "DECIMAL(12,4) DEFAULT 0.0000")
     private BigDecimal value;
 
     @ManyToOne(fetch = FetchType.LAZY)

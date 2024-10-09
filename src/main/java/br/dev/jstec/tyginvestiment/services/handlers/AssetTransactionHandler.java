@@ -36,7 +36,6 @@ public class AssetTransactionHandler {
         log.info("Creating asset transaction: {}", assetTransactionDto);
 
         validateAssetTransaction(assetTransactionDto);
-
         setDescription(assetTransactionDto);
 
         var asset = assetRepository.findBySymbol(assetTransactionDto.getAssetId())
@@ -44,6 +43,14 @@ public class AssetTransactionHandler {
 
         var account = accountRepository.findById(assetTransactionDto.getAccountId())
                 .orElseThrow(() -> new InfrastructureException(ACCOUNT_NOT_FOUND));
+
+        if (assetTransactionDto.getTransactionType().equals(TransactionType.BUY.name())) {
+            var accountBalance = account.getAvailableBalance();
+            var transactionValue = assetTransactionDto.getValue().multiply(BigDecimal.valueOf(assetTransactionDto.getQuantity()));
+            if (accountBalance.compareTo(transactionValue) < 0) {
+                throw new BusinessException(INSUFFICIENT_FUNDS);
+            }
+        }
 
         var entity = mapper.toEntity(assetTransactionDto, asset, account);
 

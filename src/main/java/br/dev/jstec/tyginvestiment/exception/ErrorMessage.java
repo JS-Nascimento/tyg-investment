@@ -19,6 +19,7 @@ public enum ErrorMessage {
     INVALID_CONVERSION_RATE(112, "Taxa de conversão inválida para a moeda {0}"),
     ACCOUNT_NOT_FOUND(113, "Conta não encontrada com o id: {0}"),
     ASSET_INVALID_INFORMATION(114, "Informação inválida para o ativo."),
+    TRANSACTION_TYPE_NOT_FOUND(115, "Tipo de transação não encontrado."),
     ;
 
     private final int code;

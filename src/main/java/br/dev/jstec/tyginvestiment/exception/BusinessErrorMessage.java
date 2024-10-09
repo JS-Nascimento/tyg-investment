@@ -13,6 +13,7 @@ public enum BusinessErrorMessage {
     ACCOUNT_ID_REQUIRED(5, "Conta é obrigatória"),
     QUANTITY_REQUIRED(6, "Quantidade negociada é obrigatória"),
     VALUE_REQUIRED(7, "Valor da transação é obrigatório"),
+    INSUFFICIENT_FUNDS(8, "Saldo insuficiente para realizar a transação"),
     ;
 
     private final int code;

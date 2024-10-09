@@ -23,7 +23,11 @@ public class AccountHoldingDto {
 
     private BigDecimal initialPrice;
 
+    private BigDecimal averagePrice;
+
     private LocalDate purchaseDate;
 
     private LocalDate dueDate;
+
+    private BigDecimal dividendAmount;
 }

@@ -36,7 +36,14 @@ public class AccountHolding extends Auditable<Long>{
     @Column(precision = 12, scale = 4 )
     private BigDecimal initialPrice;
 
+    @Column(precision = 12, scale = 4, columnDefinition = "DECIMAL(12,4) DEFAULT 0.0000")
+    private BigDecimal averagePrice;
+
     private LocalDate purchaseDate;
 
     private LocalDate dueDate;
+
+    @Column(precision = 12, scale = 4, columnDefinition = "DECIMAL(12,4) DEFAULT 0.0000")
+    private BigDecimal dividendAmount;
+
 }

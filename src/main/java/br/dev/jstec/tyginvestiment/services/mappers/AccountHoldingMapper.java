@@ -47,6 +47,8 @@ public abstract class AccountHoldingMapper {
         accountHolding.setInitialPrice(dto.getInitialPrice());
         accountHolding.setPurchaseDate(dto.getPurchaseDate());
         accountHolding.setDueDate(dto.getDueDate());
+        accountHolding.setDividendAmount(dto.getDividendAmount());
+        accountHolding.setAveragePrice(dto.getAveragePrice());
         return accountHolding;
     }
 
@@ -77,6 +79,8 @@ public abstract class AccountHoldingMapper {
         accountHoldingDto.setInitialPrice(entity.getInitialPrice());
         accountHoldingDto.setPurchaseDate(entity.getPurchaseDate());
         accountHoldingDto.setDueDate(entity.getDueDate());
+        accountHoldingDto.setDividendAmount(entity.getDividendAmount());
+        accountHoldingDto.setAveragePrice(entity.getAveragePrice());
 
         return accountHoldingDto;
     }

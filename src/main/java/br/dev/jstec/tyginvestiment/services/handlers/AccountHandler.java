@@ -6,6 +6,7 @@ import br.dev.jstec.tyginvestiment.dto.accountsummary.InvestmentSummaryStatement
 import br.dev.jstec.tyginvestiment.dto.accountsummary.PortfolioOverviewDto;
 import br.dev.jstec.tyginvestiment.exception.ErrorMessage;
 import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
+import br.dev.jstec.tyginvestiment.models.AssetTransaction;
 import br.dev.jstec.tyginvestiment.repository.AccountHoldingRepository;
 import br.dev.jstec.tyginvestiment.repository.AccountRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AccountMapper;
@@ -85,4 +86,34 @@ public class AccountHandler {
                 })
                 .toList();
     }
+
+    @Transactional
+    public void updateAccountAfterTransaction(AssetTransaction transaction) {
+        var account = accountRepository.findById(transaction.getAccount().getId())
+                .orElseThrow(() -> new InfrastructureException(ErrorMessage.ACCOUNT_NOT_FOUND,
+                        String.valueOf(transaction.getAccount().getId())));
+
+        switch (transaction.getTransactionType()) {
+            case BUY:
+                account.setAvailableBalance(account.getAvailableBalance().subtract(transaction.getValue()));
+                break;
+            case SELL, DIVIDEND:
+                account.setAvailableBalance(account.getAvailableBalance().add(transaction.getValue()));
+                break;
+            default:
+                throw new InfrastructureException(ErrorMessage.TRANSACTION_TYPE_NOT_FOUND);
+        }
+
+        var totalInvested = getInvestments((transaction.getAccount().getId()))
+                .stream()
+                .map(InvestmentDto::getTotalInvested)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        var totalBalance = account.getAvailableBalance().add(totalInvested);
+
+        account.setTotalBalance(account.getAvailableBalance().add(totalInvested));
+
+        accountRepository.save(account);
+    }
+
 }
