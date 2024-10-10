@@ -14,6 +14,7 @@ public enum BusinessErrorMessage {
     QUANTITY_REQUIRED(6, "Quantidade negociada é obrigatória"),
     VALUE_REQUIRED(7, "Valor da transação é obrigatório"),
     INSUFFICIENT_FUNDS(8, "Saldo insuficiente para realizar a transação"),
+    INVALID_OPERATION_TYPE(9, "Tipo de operação inválido"),
     ;
 
     private final int code;

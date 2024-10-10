@@ -25,6 +25,7 @@ public class AccountHoldingHandler {
     private final AccountHoldingMapper mapper;
     private final AccountHandler accountHandler;
     private final StockHandler stockHandler;
+    private final AssetTransactionHandler assetTransactionHandler;
 
     private final Map<String, AssetHandler<? extends Asset, ? extends AssetDto>> handlers;
 
@@ -47,6 +48,8 @@ public class AccountHoldingHandler {
         dto.setAsset(asset);
 
         var entity = repository.save(mapper.toEntity(dto));
+
+        assetTransactionHandler.create(mapper.toTransactionByCreateHolding(entity));
 
         return mapper.toDto(entity);
     }

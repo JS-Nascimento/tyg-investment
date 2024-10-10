@@ -36,11 +36,11 @@ public class AssetTransaction extends Auditable<Long> {
     @Column(nullable = false)
     private LocalDate transactionDate;
 
-    @Column(precision = 12, scale = 4, columnDefinition = "DECIMAL(12,4) DEFAULT 0.0000")
-    private BigDecimal quantity;
+    @Column(name = "quantity", precision = 12, scale = 4, columnDefinition = "DECIMAL(12, 4)")
+    private BigDecimal quantity = BigDecimal.ZERO;
 
-    @Column(precision = 12, scale = 4, columnDefinition = "DECIMAL(12,4) DEFAULT 0.0000")
-    private BigDecimal value;
+    @Column(name = "value", precision = 12, scale = 4, columnDefinition = "DECIMAL(12, 4)")
+    private BigDecimal value = BigDecimal.ZERO;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "asset_id", nullable = false)

@@ -46,7 +46,7 @@ public class AssetTransactionHandler {
 
         if (assetTransactionDto.getTransactionType().equals(TransactionType.BUY.name())) {
             var accountBalance = account.getAvailableBalance();
-            var transactionValue = assetTransactionDto.getValue().multiply(BigDecimal.valueOf(assetTransactionDto.getQuantity()));
+            var transactionValue = assetTransactionDto.getValue().multiply(assetTransactionDto.getQuantity());
             if (accountBalance.compareTo(transactionValue) < 0) {
                 throw new BusinessException(INSUFFICIENT_FUNDS);
             }
@@ -79,7 +79,7 @@ public class AssetTransactionHandler {
         switch (TransactionType.valueOf(assetTransactionDto.getTransactionType())) {
             case BUY:
             case SELL:
-                if (isNull(assetTransactionDto.getQuantity()) || assetTransactionDto.getQuantity() <= 0) {
+                if (isNull(assetTransactionDto.getQuantity()) || assetTransactionDto.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new BusinessException(QUANTITY_REQUIRED);
                 }
                 if (isNull(assetTransactionDto.getValue()) || assetTransactionDto.getValue().compareTo(BigDecimal.ZERO) <= 0) {

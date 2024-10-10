@@ -15,7 +15,7 @@ public class AssetTransactionDto {
     private String description;
     private String transactionType;
     private LocalDate transactionDate;
-    private Double quantity;
+    private BigDecimal quantity;
     private BigDecimal value;
     private String assetId;
     private Long accountId;
