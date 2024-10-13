@@ -1,14 +1,11 @@
 package br.dev.jstec.tyginvestiment.dto.accountsummary;
 
-import br.dev.jstec.tyginvestiment.dto.assetstype.AssetDto;
-import br.dev.jstec.tyginvestiment.enums.AssetType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -22,6 +19,7 @@ public class InvestmentSummaryStatementDto {
     private BigDecimal initialBalance;
     private BigDecimal totalBalance;
     private BigDecimal availableBalance;
+    private BigDecimal dividendAmount;
 
     private List<InvestmentDto> investments;
 }

@@ -2,7 +2,6 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.dto.AssetTransactionDto;
 import br.dev.jstec.tyginvestiment.enums.TransactionType;
-import br.dev.jstec.tyginvestiment.events.AssetTransactionSavedEvent;
 import br.dev.jstec.tyginvestiment.exception.BusinessException;
 import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.repository.AccountRepository;
@@ -29,11 +28,19 @@ public class AssetTransactionHandler {
     private final AssetTransactionRepository repository;
     private final AssetRepository assetRepository;
     private final AccountRepository accountRepository;
+    private final AccountHoldingHandler accountHoldingHandler;
+    private final AccountHandler accountHandler;
+    private final AccountHistoryHandler accountHistoryHandler;
     private final AssetTransactionMapper mapper;
     private final ApplicationEventPublisher publisher;
 
     public AssetTransactionDto create(AssetTransactionDto assetTransactionDto) {
         log.info("Creating asset transaction: {}", assetTransactionDto);
+
+        var assetHolding = accountHoldingHandler.findById(assetTransactionDto.getAccountId(), assetTransactionDto.getAssetId());
+        if (isNull(assetHolding)) {
+            throw new BusinessException(ASSET_NOT_FOUND_IN_ACCOUNT);
+        }
 
         validateAssetTransaction(assetTransactionDto);
         setDescription(assetTransactionDto);
@@ -50,13 +57,20 @@ public class AssetTransactionHandler {
             if (accountBalance.compareTo(transactionValue) < 0) {
                 throw new BusinessException(INSUFFICIENT_FUNDS);
             }
+            account.setAvailableBalance(accountBalance.subtract(transactionValue));
         }
 
         var entity = mapper.toEntity(assetTransactionDto, asset, account);
 
         var transaction = repository.save(entity);
+        accountRepository.save(account);
 
-        publisher.publishEvent(new AssetTransactionSavedEvent(this, transaction));
+        //publisher.publishEvent(new AssetTransactionSavedEvent(this, transaction));
+
+        accountHoldingHandler.updateHoldingAfterTransaction(transaction);
+        accountHandler.updateAccountAfterTransaction(transaction);
+        accountHistoryHandler.createAccountHistoryByTransaction(transaction);
+
 
         return mapper.toDto(transaction);
     }
@@ -105,6 +119,6 @@ public class AssetTransactionHandler {
                     assetTransactionDto.setDescription("Dividendo de " + assetTransactionDto.getValue() + " recebido de " + assetTransactionDto.getAssetId());
             case OTHER -> assetTransactionDto.setDescription("Outros");
         }
-        ;
+
     }
 }

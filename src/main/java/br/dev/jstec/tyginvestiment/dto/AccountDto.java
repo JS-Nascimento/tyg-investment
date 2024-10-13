@@ -19,6 +19,7 @@ public class AccountDto {
     private BigDecimal initialBalance;
     private BigDecimal totalBalance;
     private BigDecimal availableBalance;
+    private BigDecimal dividendAmount;
     private Long userId;
     private Long createdBy;
     private LocalDateTime createdDate;

@@ -46,6 +46,6 @@ public class AccountHistoryHandler {
     @Transactional
     public void createAccountHistoryByTransaction(AssetTransaction transaction) {
         var entity = mapper.toEntity(transaction);
-        repository.saveAndFlush(entity);
+        repository.save(entity);
     }
 }

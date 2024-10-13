@@ -14,7 +14,7 @@ public class AssetJobService {
 
     private final StockQuotationHandler handler;
 
-    //    @Scheduled(cron = "0 0/1 * * * ?")
+    // @Scheduled(cron = "0 0/1 * * * ?")
     @Scheduled(cron = "0 0 20 ? * MON-FRI")
     @Async
     public void updateCurrencyRateConversion() {

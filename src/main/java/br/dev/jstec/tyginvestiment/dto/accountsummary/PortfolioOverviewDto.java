@@ -31,11 +31,10 @@ import static java.util.Objects.nonNull;
                         @ColumnResult(name = "purchaseDate", type = LocalDate.class),
                         @ColumnResult(name = "price", type = BigDecimal.class),
                         @ColumnResult(name = "priceDate", type = LocalDate.class),
-                        @ColumnResult(name = "value", type = BigDecimal.class),
-                        @ColumnResult(name = "profit", type = BigDecimal.class),
+                        @ColumnResult(name = "dividendAmount", type = BigDecimal.class),
                         @ColumnResult(name = "rate", type = BigDecimal.class),
-                        @ColumnResult(name = "rateDate", type = LocalDateTime.class)
-
+                        @ColumnResult(name = "rateDate", type = LocalDateTime.class),
+                        @ColumnResult(name = "value", type = BigDecimal.class)
                 }
         )
 )
@@ -76,10 +75,10 @@ import static java.util.Objects.nonNull;
                        ah.purchasedate AS purchaseDate,
                        lst.latest_price AS price,
                        lst.latest_date AS priceDate,
-                       ah.quantity * lst.latest_price AS value,
-                       ah.quantity * lst.latest_price - ah.initialprice * ah.quantity AS profit,
+                       ah.dividendamount AS dividendAmount,
                        lcr.latest_rate AS rate,
-                       lcr.latest_date AS rateDate
+                       lcr.latest_date AS rateDate,
+                       ah.quantity * lst.latest_price AS value
                 FROM account_holdings ah
                 LEFT JOIN assets ast ON ah.asset_id = ast.symbol
                 LEFT JOIN LatestStockQuotation lst ON ah.asset_id = lst.stock_id
@@ -101,10 +100,19 @@ public class PortfolioOverviewDto {
     private BigDecimal price;
     private LocalDate priceDate;
     private BigDecimal value;
+    private BigDecimal dividendAmount;
     private BigDecimal profit;
     private BigDecimal rate;
     private LocalDateTime rateDate;
     private BigDecimal valueConverted;
+
+    public BigDecimal getProfit() {
+
+        var lastValue = getQuantity().multiply(getPrice());
+        var initialValue = getInitialQuantity().multiply(getInitialPrice());
+
+        return lastValue.subtract(initialValue).add(getDividendAmount()).setScale(3, RoundingMode.HALF_UP);
+    }
 
     public BigDecimal getValueConverted() {
         return nonNull(value)

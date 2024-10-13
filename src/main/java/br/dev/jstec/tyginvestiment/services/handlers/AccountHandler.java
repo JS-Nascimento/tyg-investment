@@ -111,7 +111,7 @@ public class AccountHandler {
 
         var totalBalance = account.getAvailableBalance().add(totalInvested);
 
-        account.setTotalBalance(account.getAvailableBalance().add(totalInvested));
+        account.setTotalBalance(totalBalance);
 
         accountRepository.save(account);
     }

@@ -77,16 +77,16 @@ public abstract class AccountMapper {
         dto.setCurrency(accountDto.getCurrency());
         dto.setInitialBalance(accountDto.getInitialBalance());
         dto.setAvailableBalance(accountDto.getAvailableBalance());
-
-        if (investments == null || investments.isEmpty()) {
-            return dto;
-        }
+        dto.setDividendAmount(accountDto.getDividendAmount());
 
         var totalInvested = investments.stream()
                 .map(InvestmentDto::getTotalInvested)
                 .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(3, RoundingMode.HALF_UP);
 
         dto.setTotalBalance(totalInvested);
+        if (investments == null || investments.isEmpty()) {
+            return dto;
+        }
 
         dto.setInvestments(investments);
         return dto;

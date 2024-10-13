@@ -2,34 +2,53 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.dto.AccountHoldingDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.AssetDto;
+import br.dev.jstec.tyginvestiment.events.AssetTransactionSavedEvent;
+import br.dev.jstec.tyginvestiment.exception.BusinessException;
 import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.models.Asset;
 import br.dev.jstec.tyginvestiment.models.AssetTransaction;
 import br.dev.jstec.tyginvestiment.repository.AccountHoldingRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AccountHoldingMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.math.RoundingMode;
 import java.util.Map;
 
 import static br.dev.jstec.tyginvestiment.enums.AssetType.getBaseType;
+import static br.dev.jstec.tyginvestiment.exception.BusinessErrorMessage.ASSET_ALREADY_EXISTS_IN_ACCOUNT;
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ACCOUNT_NOT_FOUND;
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ASSET_INVALID_INFORMATION;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AccountHoldingHandler {
 
     private final AccountHoldingRepository repository;
     private final AccountHoldingMapper mapper;
     private final AccountHandler accountHandler;
     private final StockHandler stockHandler;
-    private final AssetTransactionHandler assetTransactionHandler;
+    private final ApplicationEventPublisher publisher;
 
     private final Map<String, AssetHandler<? extends Asset, ? extends AssetDto>> handlers;
 
+    public AccountHoldingDto findById(Long accountId, String assetId) {
+        return repository
+                .findAccountHoldingByAccountIdAndAssetId(accountId, assetId)
+                .map(mapper::toDto).orElse(null);
+    }
+
+
     public AccountHoldingDto save(AccountHoldingDto dto) {
+
+        repository.findAccountHoldingByAccountIdAndAssetId(dto.getAccount().getId(), dto.getAsset().getSymbol())
+                .ifPresent(holding -> {
+                    throw new BusinessException(ASSET_ALREADY_EXISTS_IN_ACCOUNT);
+                });
+
         var account = accountHandler.findById(dto.getAccount().getId());
 
         if (account == null) {
@@ -49,7 +68,9 @@ public class AccountHoldingHandler {
 
         var entity = repository.save(mapper.toEntity(dto));
 
-        assetTransactionHandler.create(mapper.toTransactionByCreateHolding(entity));
+        var transaction = mapper.toTransactionByCreateHolding(entity);
+
+        publisher.publishEvent(new AssetTransactionSavedEvent(this, transaction));
 
         return mapper.toDto(entity);
     }

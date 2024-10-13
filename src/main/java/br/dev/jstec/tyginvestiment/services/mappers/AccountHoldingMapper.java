@@ -1,15 +1,11 @@
 package br.dev.jstec.tyginvestiment.services.mappers;
 
 import br.dev.jstec.tyginvestiment.dto.AccountHoldingDto;
-import br.dev.jstec.tyginvestiment.dto.AssetTransactionDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.CryptoDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
 import br.dev.jstec.tyginvestiment.enums.TransactionType;
-import br.dev.jstec.tyginvestiment.models.AccountHolding;
-import br.dev.jstec.tyginvestiment.models.Crypto;
-import br.dev.jstec.tyginvestiment.models.Fund;
-import br.dev.jstec.tyginvestiment.models.Stock;
+import br.dev.jstec.tyginvestiment.models.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,14 +85,14 @@ public abstract class AccountHoldingMapper {
         return accountHoldingDto;
     }
 
-    public AssetTransactionDto toTransactionByCreateHolding(AccountHolding entity) {
-        AssetTransactionDto transaction = new AssetTransactionDto();
-        transaction.setAccountId(entity.getAccount().getId());
-        transaction.setAssetId(entity.getAsset().getSymbol());
+    public AssetTransaction toTransactionByCreateHolding(AccountHolding entity) {
+        AssetTransaction transaction = new AssetTransaction();
+        transaction.setAccount(entity.getAccount());
+        transaction.setAsset(entity.getAsset());
         transaction.setQuantity(entity.getInitialQuantity());
         transaction.setValue(entity.getInitialPrice());
         transaction.setTransactionDate(LocalDate.now());
-        transaction.setTransactionType(TransactionType.BUY.name());
+        transaction.setTransactionType(TransactionType.BUY);
         transaction.setDescription("Compra Inicial.");
         return transaction;
     }

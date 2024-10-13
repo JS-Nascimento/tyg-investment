@@ -15,6 +15,8 @@ public enum BusinessErrorMessage {
     VALUE_REQUIRED(7, "Valor da transação é obrigatório"),
     INSUFFICIENT_FUNDS(8, "Saldo insuficiente para realizar a transação"),
     INVALID_OPERATION_TYPE(9, "Tipo de operação inválido"),
+    ASSET_ALREADY_EXISTS_IN_ACCOUNT(10, "Ativo já cadastrado na conta"),
+    ASSET_NOT_FOUND_IN_ACCOUNT(11, "Ativo não encontrado na conta"),
     ;
 
     private final int code;
