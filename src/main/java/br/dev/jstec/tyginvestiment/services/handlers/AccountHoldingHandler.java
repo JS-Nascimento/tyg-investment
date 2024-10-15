@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.RoundingMode;
 import java.util.Map;
@@ -75,8 +76,9 @@ public class AccountHoldingHandler {
         return mapper.toDto(entity);
     }
 
-
+    @Transactional
     public void updateHoldingAfterTransaction(AssetTransaction transaction) {
+        log.info("Updating holding after transaction: {}", transaction.getId());
         var assetHolding = repository
                 .findAccountHoldingByAccountIdAndAssetId(
                         transaction.getAccount().getId(),
@@ -90,8 +92,7 @@ public class AccountHoldingHandler {
                         assetHolding.getAveragePrice()
                                 .multiply(assetHolding.getQuantity())
                                 .add(transaction.getValue().multiply(transaction.getQuantity()))
-                                .divide(assetHolding.getQuantity().add(transaction.getQuantity()))
-                                .setScale(4, RoundingMode.HALF_EVEN));
+                                .divide(assetHolding.getQuantity().add(transaction.getQuantity()), 4, RoundingMode.HALF_EVEN));
                 break;
             case SELL:
                 assetHolding.setQuantity(assetHolding.getQuantity().subtract(transaction.getQuantity()));

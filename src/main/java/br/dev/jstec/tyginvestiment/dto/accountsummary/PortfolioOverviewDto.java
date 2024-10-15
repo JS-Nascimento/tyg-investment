@@ -33,8 +33,7 @@ import static java.util.Objects.nonNull;
                         @ColumnResult(name = "priceDate", type = LocalDate.class),
                         @ColumnResult(name = "dividendAmount", type = BigDecimal.class),
                         @ColumnResult(name = "rate", type = BigDecimal.class),
-                        @ColumnResult(name = "rateDate", type = LocalDateTime.class),
-                        @ColumnResult(name = "value", type = BigDecimal.class)
+                        @ColumnResult(name = "rateDate", type = LocalDateTime.class)
                 }
         )
 )
@@ -77,8 +76,7 @@ import static java.util.Objects.nonNull;
                        lst.latest_date AS priceDate,
                        ah.dividendamount AS dividendAmount,
                        lcr.latest_rate AS rate,
-                       lcr.latest_date AS rateDate,
-                       ah.quantity * lst.latest_price AS value
+                       lcr.latest_date AS rateDate
                 FROM account_holdings ah
                 LEFT JOIN assets ast ON ah.asset_id = ast.symbol
                 LEFT JOIN LatestStockQuotation lst ON ah.asset_id = lst.stock_id
@@ -106,6 +104,10 @@ public class PortfolioOverviewDto {
     private LocalDateTime rateDate;
     private BigDecimal valueConverted;
 
+    public BigDecimal getValue() {
+        return quantity.multiply(price).setScale(3, RoundingMode.HALF_UP);
+    }
+
     public BigDecimal getProfit() {
 
         var lastValue = getQuantity().multiply(getPrice());
@@ -115,8 +117,10 @@ public class PortfolioOverviewDto {
     }
 
     public BigDecimal getValueConverted() {
-        return nonNull(value)
-                ? value.divide(rate, MathContext.DECIMAL128).setScale(3, RoundingMode.HALF_UP)
+        var total = quantity.multiply(price).setScale(3, RoundingMode.HALF_UP);
+
+        return nonNull(total)
+                ? total.divide(rate, MathContext.DECIMAL128).setScale(3, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO;
     }
 }

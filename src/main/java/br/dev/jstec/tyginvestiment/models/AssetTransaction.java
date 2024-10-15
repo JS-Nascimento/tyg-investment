@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @Entity
+@ToString(callSuper = true)
 @Table(name = "asset_transactions",
         indexes = {
                 @Index(name = "idx_asset_transactions_transaction_date", columnList = "transactiondate"),

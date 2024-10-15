@@ -2,6 +2,7 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.dto.AssetTransactionDto;
 import br.dev.jstec.tyginvestiment.enums.TransactionType;
+import br.dev.jstec.tyginvestiment.events.AssetTransactionSavedEvent;
 import br.dev.jstec.tyginvestiment.exception.BusinessException;
 import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.repository.AccountRepository;
@@ -19,6 +20,7 @@ import static br.dev.jstec.tyginvestiment.exception.BusinessErrorMessage.*;
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ACCOUNT_NOT_FOUND;
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ASSET_NOT_FOUND;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @Component
 @RequiredArgsConstructor
@@ -65,14 +67,12 @@ public class AssetTransactionHandler {
         var transaction = repository.save(entity);
         accountRepository.save(account);
 
-        //publisher.publishEvent(new AssetTransactionSavedEvent(this, transaction));
-
-        accountHoldingHandler.updateHoldingAfterTransaction(transaction);
-        accountHandler.updateAccountAfterTransaction(transaction);
-        accountHistoryHandler.createAccountHistoryByTransaction(transaction);
-
+        if (nonNull(transaction.getId())) {
+            publisher.publishEvent(new AssetTransactionSavedEvent(this, transaction));
+        }
 
         return mapper.toDto(transaction);
+
     }
 
     private void validateAssetTransaction(AssetTransactionDto assetTransactionDto) {

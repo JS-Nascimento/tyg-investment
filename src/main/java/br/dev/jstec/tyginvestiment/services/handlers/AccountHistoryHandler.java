@@ -6,6 +6,7 @@ import br.dev.jstec.tyginvestiment.models.specification.AccountHistorySpecificat
 import br.dev.jstec.tyginvestiment.repository.AccountHistoryRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AccountHistoryMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AccountHistoryHandler {
 
     private final AccountHistoryRepository repository;
@@ -45,6 +47,7 @@ public class AccountHistoryHandler {
 
     @Transactional
     public void createAccountHistoryByTransaction(AssetTransaction transaction) {
+        log.info("Creating account history by transaction: {}", transaction.getId());
         var entity = mapper.toEntity(transaction);
         repository.save(entity);
     }

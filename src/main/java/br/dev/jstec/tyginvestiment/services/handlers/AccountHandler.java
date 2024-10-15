@@ -89,6 +89,7 @@ public class AccountHandler {
 
     @Transactional
     public void updateAccountAfterTransaction(AssetTransaction transaction) {
+        log.info("Updating account after transaction: {}", transaction.getId());
         var account = accountRepository.findById(transaction.getAccount().getId())
                 .orElseThrow(() -> new InfrastructureException(ErrorMessage.ACCOUNT_NOT_FOUND,
                         String.valueOf(transaction.getAccount().getId())));

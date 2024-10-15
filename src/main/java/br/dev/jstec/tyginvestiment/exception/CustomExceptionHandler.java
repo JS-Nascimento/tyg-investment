@@ -86,7 +86,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     ResponseEntity<ResponseErrorMessage> handleBusinessException(BusinessException ex) {
 
-        log.error(INVALID_INFORMATION_ERROR.getMsg(), ex.getMessage());
+        log.error("[BusinessException] - {} - {}", ex.getCode(), ex.getMessage());
         return status(BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ResponseErrorMessage.builder()
