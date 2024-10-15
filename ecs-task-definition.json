@@ -50,15 +50,7 @@
           "name": "ALPHA_VANTAGE_API_KEY",
           "valueFrom": "arn:aws:ssm:us-east-1:206450197450:parameter/tyg/ALPHA_VANTAGE_API_KEY"
         }
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/tyg-investiment",
-          "awslogs-region": "us-east-1",
-          "awslogs-stream-prefix": "ecs"
-        }
-      }
+      ]
     }
   ],
   "requiresCompatibilities": [
