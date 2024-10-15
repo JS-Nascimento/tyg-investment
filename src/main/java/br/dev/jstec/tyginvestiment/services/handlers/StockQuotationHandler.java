@@ -2,7 +2,6 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.clients.AlphaClient;
 import br.dev.jstec.tyginvestiment.clients.GeckoCoinClient;
-import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
 import br.dev.jstec.tyginvestiment.enums.AssetType;
 import br.dev.jstec.tyginvestiment.models.Asset;
 import br.dev.jstec.tyginvestiment.repository.AssetRepository;
@@ -10,6 +9,7 @@ import br.dev.jstec.tyginvestiment.repository.StockQuotationRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetQuotationMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +25,9 @@ public class StockQuotationHandler {
     private final AlphaClient alphaClient;
     private final GeckoCoinClient geckoClient;
     private final AssetQuotationMapper mapper;
-    private final ApiKeyManager apiKeyManager;
+
+    @Value("${alpha-vantage.api-key}")
+    private String apiKey;
 
     @Transactional
     public void updateQuotations() {
@@ -46,7 +48,7 @@ public class StockQuotationHandler {
 
                 log.info("Atualizando cotação da ação {}", asset.getSymbol());
 
-                var stockQuotation = alphaClient.getGlobalQuote(asset.getSymbol(), apiKeyManager.getAvailableApiKey());
+                var stockQuotation = alphaClient.getGlobalQuote(asset.getSymbol(), apiKey);
                 if (stockQuotation != null) {
                     stockQuotationRepository.saveAndFlush(mapper.toStockQuotation(stockQuotation.getGlobalQuote(), asset));
                     log.info("Cotação da ação {} atualizada com sucesso", asset.getSymbol());

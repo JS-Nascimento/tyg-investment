@@ -2,7 +2,6 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.clients.AlphaClient;
 import br.dev.jstec.tyginvestiment.clients.dto.AlphaVantageClient;
-import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
 import br.dev.jstec.tyginvestiment.events.AssetSavedEvent;
 import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
@@ -11,6 +10,7 @@ import br.dev.jstec.tyginvestiment.repository.StockRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +34,8 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
 
     private final AssetHistoryHandler assetHistoryHandler;
 
-    private final ApiKeyManager apiKeyManager;
+    @Value("${alpha-vantage.api-key}")
+    private String apiKey;
 
     @Override
     @Transactional
@@ -82,7 +83,7 @@ public class StockHandler implements AssetHandler<Stock, StockDto> {
     @Transactional
     public AlphaVantageClient getAsset(String symbol) {
 
-        var asset = alphaClient.getAssetInfo(symbol, apiKeyManager.getAvailableApiKey());
+        var asset = alphaClient.getAssetInfo(symbol, apiKey);
 
         validateClientApiResponse(asset);
 

@@ -2,7 +2,6 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.clients.AlphaClient;
 import br.dev.jstec.tyginvestiment.clients.GeckoCoinClient;
-import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
 import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.models.AssetTransaction;
 import br.dev.jstec.tyginvestiment.models.StockQuotation;
@@ -10,6 +9,7 @@ import br.dev.jstec.tyginvestiment.repository.AssetRepository;
 import br.dev.jstec.tyginvestiment.repository.StockQuotationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +36,9 @@ public class AssetHistoryHandler {
     private final StockQuotationRepository stockQuotationRepository;
     private final AssetRepository assetRepository;
 
-    private final ApiKeyManager apiKeyManager;
+    @Value("${alpha-vantage.api-key}")
+    private String apiKey;
+
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public CompletableFuture<Void> getAssetHistory(String symbol) {
@@ -46,7 +48,7 @@ public class AssetHistoryHandler {
         var asset = assetRepository.findBySymbol(symbol)
                 .orElseThrow(() -> new RuntimeException("Asset not found"));
 
-        var history = alphaClient.getAssetHistory(asset.getSymbol(), apiKeyManager.getAvailableApiKey());
+        var history = alphaClient.getAssetHistory(asset.getSymbol(), apiKey);
 
         if (nonNull(history.getInformation())) {
             throw new RuntimeException(format("Error getting asset history with {0}", history.getInformation()));

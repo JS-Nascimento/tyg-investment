@@ -1,0 +1,69 @@
+{
+  "family": "tyg-investiment-task",
+  "networkMode": "awsvpc",
+  "executionRoleArn": "arn:aws:iam::206450197450:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::206450197450:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "tyg-investiment-container",
+      "image": "206450197450.dkr.ecr.us-east-1.amazonaws.com/jstec/tyg-investement:${IMAGE_TAG}",
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "SPRING_PROFILES_ACTIVE",
+          "value": "prod"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_HOST",
+          "valueFrom": "arn:aws:ssm:us-east-1:206450197450:parameter/tyg/DATABASE_HOST"
+        },
+        {
+          "name": "DATABASE_USERNAME",
+          "valueFrom": "arn:aws:ssm:us-east-1:206450197450:parameter/tyg/DATABASE_USERNAME"
+        },
+        {
+          "name": "DATABASE_PASSWORD",
+          "valueFrom": "arn:aws:ssm:us-east-1:206450197450:parameter/tyg/DATABASE_PASSWORD"
+        },
+        {
+          "name": "EXCHANGE_API_KEY",
+          "valueFrom": "arn:aws:ssm:us-east-1:206450197450:parameter/tyg/EXCHANGE_API_KEY"
+        },
+        {
+          "name": "CURRENCY_LAYER_API_KEY",
+          "valueFrom": "arn:aws:ssm:us-east-1:206450197450:parameter/tyg/CURRENCY_LAYER_API_KEY"
+        },
+        {
+          "name": "COIN_GECKO_API_KEY",
+          "valueFrom": "arn:aws:ssm:us-east-1:206450197450:parameter/tyg/COIN_GECKO_API_KEY"
+        },
+        {
+          "name": "ALPHA_VANTAGE_API_KEY",
+          "valueFrom": "arn:aws:ssm:us-east-1:206450197450:parameter/tyg/ALPHA_VANTAGE_API_KEY"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/tyg-investiment",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "512",
+  "memory": "1024"
+}

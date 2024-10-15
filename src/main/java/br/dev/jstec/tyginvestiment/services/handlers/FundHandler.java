@@ -2,7 +2,6 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.clients.AlphaClient;
 import br.dev.jstec.tyginvestiment.clients.dto.EtfProfileDto;
-import br.dev.jstec.tyginvestiment.config.ApiKeyManager;
 import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
 import br.dev.jstec.tyginvestiment.enums.AssetType;
 import br.dev.jstec.tyginvestiment.events.AssetSavedEvent;
@@ -12,6 +11,7 @@ import br.dev.jstec.tyginvestiment.repository.FundRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +36,9 @@ public class FundHandler implements AssetHandler<Fund, FundDto> {
 
     private final ApplicationEventPublisher publisher;
 
-    private final ApiKeyManager apiKeyManager;
+    @Value("${alpha-vantage.api-key}")
+    private String apiKey;
+
 
     @Transactional(timeout = 300)
     @Override
@@ -92,7 +94,7 @@ public class FundHandler implements AssetHandler<Fund, FundDto> {
     @Transactional
     public EtfProfileDto getAsset(String symbol) {
 
-        var asset = alphaClient.getEtfProfile(symbol, apiKeyManager.getAvailableApiKey());
+        var asset = alphaClient.getEtfProfile(symbol, apiKey);
 
         validateClientApiResponse(asset);
 
