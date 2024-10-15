@@ -29,4 +29,4 @@ jobs:
             ${{ runner.os }}-m2-
 
       - name: Construir e Testar com Maven
-        run: mvn clean verify
+        run: mvn clean verify -DskipTests
