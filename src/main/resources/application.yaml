@@ -28,19 +28,33 @@ spring:
               connectTimeout: 5000
               readTimeout: 60000
 
-
+  security:
+    oauth2:
+      client:
+        registration:
+          front-end:
+            client-id: 188f6b3984a2fd15acd48e882a72a1e6
+            client-secret: f08f886246187173b0caa392ad8b3512
+            #            authorization-grant-type: authorization_code
+            #            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid,profile,email
 server:
   servlet:
     context-path: /tyg-investments
 
 
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: health,info,metrics
-#
-#
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      cors:
+        allowed-origins: http://localhost:3000
+
+
+
+
 
 logging:
   level:
@@ -52,6 +66,9 @@ logging:
       client: debug
 
 app:
+  jwt:
+    secret:
+      key: ${JWT_SECRET_KEY}
   config:
     currency-base: BRL
     decimal-places: 4
