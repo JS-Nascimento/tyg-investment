@@ -34,6 +34,15 @@ public class User extends Auditable<Long> {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean enabled = true;
+
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean accountNonExpired = true;
+
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean isAccountNonLocked = true;
+
     @PrePersist
     protected void onCreate() {
         if (tenantId == null) {
