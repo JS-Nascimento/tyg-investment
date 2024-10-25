@@ -66,10 +66,10 @@ logging:
     feign:
       client: debug
 
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
 app:
-  jwt:
-    secret:
-      key: ${JWT_SECRET_KEY}
   config:
     currency-base: BRL
     decimal-places: 4
