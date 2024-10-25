@@ -71,7 +71,7 @@ logging:
 app:
   jwt:
     secret:
-      key: ${JWT_SECRET_KEY}
+      key: ${JWT_SECRET_KEY:f08f886246187173b0caa392ad8b3512}
   config:
     currency-base: BRL
     decimal-places: 4
