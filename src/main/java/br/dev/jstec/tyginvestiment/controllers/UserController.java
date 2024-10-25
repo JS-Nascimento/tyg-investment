@@ -5,10 +5,11 @@ import br.dev.jstec.tyginvestiment.services.handlers.UserHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+import static br.dev.jstec.tyginvestiment.config.security.TenantContext.getTenant;
 
 @Slf4j
 @RestController
@@ -22,5 +23,11 @@ public class UserController {
     public ResponseEntity<UserDto> saveUser(@RequestBody UserDto dto) {
         var user = handler.saveUser(dto);
         return ResponseEntity.status(201).body(user);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getUser(@PathVariable UUID id) {
+        var user = handler.getUserByTenantId(getTenant());
+        return ResponseEntity.ok(user);
     }
 }

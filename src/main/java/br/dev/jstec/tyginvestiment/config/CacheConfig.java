@@ -7,7 +7,8 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.concurrent.TimeUnit;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 @Configuration
 @EnableCaching
@@ -15,13 +16,17 @@ public class CacheConfig {
 
     @Bean
     public Caffeine<Object, Object> caffeineConfig() {
-        return Caffeine.newBuilder().expireAfterWrite(60, TimeUnit.MILLISECONDS);
+        return Caffeine.newBuilder().expireAfterWrite(60, MILLISECONDS);
     }
 
     @Bean
     public CacheManager cacheManager(Caffeine<Object, Object> caffeine) {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        cacheManager.setCaffeine(caffeine);
+        var cacheManager = new CaffeineCacheManager();
+        cacheManager.setCaffeine(
+                Caffeine.newBuilder()
+                        .initialCapacity(100)
+                        .maximumSize(500)
+                        .expireAfterAccess(10, MINUTES));
         return cacheManager;
     }
 }
