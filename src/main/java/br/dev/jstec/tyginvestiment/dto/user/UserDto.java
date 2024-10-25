@@ -1,4 +1,4 @@
-package br.dev.jstec.tyginvestiment.dto;
+package br.dev.jstec.tyginvestiment.dto.user;
 
 
 import lombok.Data;
