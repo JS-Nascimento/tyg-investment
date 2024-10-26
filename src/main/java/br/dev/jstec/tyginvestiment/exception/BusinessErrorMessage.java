@@ -17,6 +17,8 @@ public enum BusinessErrorMessage {
     INVALID_OPERATION_TYPE(9, "Tipo de operação inválido"),
     ASSET_ALREADY_EXISTS_IN_ACCOUNT(10, "Ativo já cadastrado na conta"),
     ASSET_NOT_FOUND_IN_ACCOUNT(11, "Ativo não encontrado na conta"),
+    OLD_PASSWORD_NOT_MATCH(12, "Senha atual não confere."),
+    NEW_PASSWORD_NOT_MATCH(13, "Nova senha e confirmação não conferem"),
     ;
 
     private final int code;
