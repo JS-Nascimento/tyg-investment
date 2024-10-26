@@ -1,10 +1,9 @@
 package br.dev.jstec.tyginvestiment.services.handlers;
 
-import br.dev.jstec.tyginvestiment.dto.UserDto;
-import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.dto.user.ChangePasswordDto;
 import br.dev.jstec.tyginvestiment.dto.user.UserDto;
 import br.dev.jstec.tyginvestiment.exception.BusinessException;
+import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.models.User;
 import br.dev.jstec.tyginvestiment.repository.UserRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.UserMapper;
@@ -18,9 +17,6 @@ import java.util.UUID;
 
 import static br.dev.jstec.tyginvestiment.exception.BusinessErrorMessage.NEW_PASSWORD_NOT_MATCH;
 import static br.dev.jstec.tyginvestiment.exception.BusinessErrorMessage.OLD_PASSWORD_NOT_MATCH;
-
-import java.util.UUID;
-
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.USER_NOT_FOUND;
 
 @Component

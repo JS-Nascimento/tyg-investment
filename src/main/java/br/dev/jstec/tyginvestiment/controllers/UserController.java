@@ -8,15 +8,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 import static br.dev.jstec.tyginvestiment.config.security.TenantContext.getTenant;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -34,7 +31,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDto> getUser(@PathVariable UUID id) {
+    public ResponseEntity<UserDto> getUserInfo() {
         var user = handler.getUserByTenantId(getTenant());
         return ResponseEntity.ok(user);
     }
