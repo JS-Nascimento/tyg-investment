@@ -1,7 +1,10 @@
 package br.dev.jstec.tyginvestiment.controllers;
 
-import br.dev.jstec.tyginvestiment.dto.UserDto;
+import br.dev.jstec.tyginvestiment.dto.user.ChangePasswordDto;
+import br.dev.jstec.tyginvestiment.dto.user.UserDto;
 import br.dev.jstec.tyginvestiment.services.handlers.UserHandler;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -10,11 +13,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 import static br.dev.jstec.tyginvestiment.config.security.TenantContext.getTenant;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
 
     private final UserHandler handler;
@@ -29,5 +37,15 @@ public class UserController {
     public ResponseEntity<UserDto> getUser(@PathVariable UUID id) {
         var user = handler.getUserByTenantId(getTenant());
         return ResponseEntity.ok(user);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> changePassword(@PathVariable
+                                               @NotNull(message = "Id do Usuário é obrigatório") UUID id,
+                                               @RequestBody @Valid ChangePasswordDto dto) {
+
+
+        handler.changePassword(id, dto);
+        return ResponseEntity.ok().build();
     }
 }
