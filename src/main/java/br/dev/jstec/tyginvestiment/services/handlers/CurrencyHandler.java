@@ -2,17 +2,23 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.dto.BaseCurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
+import br.dev.jstec.tyginvestiment.dto.currencies.CurrencyQuotationHistoryDto;
+import br.dev.jstec.tyginvestiment.exception.BusinessException;
 import br.dev.jstec.tyginvestiment.repository.CurrencyTargetRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.CurrencyMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Currency;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
+import static br.dev.jstec.tyginvestiment.exception.BusinessErrorMessage.CURRENCY_NOT_FOUND;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -55,7 +61,7 @@ public class CurrencyHandler {
     @Transactional(readOnly = true)
     public BaseCurrencyDto getBaseCurrency() {
 
-         var currency = currencyRepository.findAll();
+        var currency = currencyRepository.findAll();
 
         var baseCurrency = Currency.getInstance(currencyBase);
 
@@ -81,7 +87,7 @@ public class CurrencyHandler {
 
     @Transactional
     public void updateCurrency() {
-        var currencies = new HashSet<>(currencyRepository.findAll()) ;
+        var currencies = new HashSet<>(currencyRepository.findAll());
 
         conversionRateHandler.updateConversionRate(currencies, currencyBase);
     }
@@ -99,7 +105,7 @@ public class CurrencyHandler {
     private void validateCurrency(CurrencyDto dto) {
 
         if (isNull(dto) || isBlank(dto.getCode())) {
-            throw new IllegalArgumentException("Invalid currency data");
+            throw new BusinessException(CURRENCY_NOT_FOUND);
         }
     }
 
@@ -116,5 +122,27 @@ public class CurrencyHandler {
 
             saveCurrency(currencyDto);
         }
+    }
+
+    @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
+    public List<CurrencyQuotationHistoryDto> getHistoryByCodeWithLimit(String code, int limit) {
+        if (isBlank(code)) {
+            throw new BusinessException(CURRENCY_NOT_FOUND);
+        }
+        if (!exists(code)) {
+            throw new BusinessException(CURRENCY_NOT_FOUND);
+        }
+        if (limit <= 0) {
+            limit = 30;
+        }
+        return currencyRepository.getHistory(code, limit)
+                .stream()
+                .map(tuple -> new CurrencyQuotationHistoryDto(
+                        tuple.get(0, Double.class),
+                        tuple.get(1, Double.class),
+                        tuple.get(2, Double.class),
+                        tuple.get(3, Date.class)
+                ))
+                .toList();
     }
 }
