@@ -19,6 +19,7 @@ public enum BusinessErrorMessage {
     ASSET_NOT_FOUND_IN_ACCOUNT(11, "Ativo não encontrado na conta"),
     OLD_PASSWORD_NOT_MATCH(12, "Senha atual não confere."),
     NEW_PASSWORD_NOT_MATCH(13, "Nova senha e confirmação não conferem"),
+    CURRENCY_NOT_FOUND(14, "Moeda não encontrada"),
     ;
 
     private final int code;
