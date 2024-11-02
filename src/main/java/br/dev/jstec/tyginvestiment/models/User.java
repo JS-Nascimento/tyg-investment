@@ -34,6 +34,9 @@ public class User extends Auditable<Long> {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false, length = 4)
+    private String baseCurrency;
+
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean enabled = true;
 

@@ -47,6 +47,10 @@ public class CustomUserDetails implements UserDetails {
         return user.getEmail();
     }
 
+    public String getBaseCurrency() {
+        return user.getBaseCurrency();
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

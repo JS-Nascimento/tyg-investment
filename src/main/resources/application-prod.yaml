@@ -90,7 +90,9 @@ currency-layer:
   base-url: https://api.currencylayer.com
 
 exchangerate:
-  base-url: https://v6.exchangerate-api.com/v6/${EXCHANGE_API_KEY}/latest/${app.config.currency-base}
+  base-url: https://v6.exchangerate-api.com/v6/${EXCHANGE_API_KEY}
+  rate-url: /latest
+  list-url: /codes
 
 coin-gecko:
   api-key: ${COIN_GECKO_API_KEY}

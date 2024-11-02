@@ -16,6 +16,7 @@ public class UserDto {
     private UUID tenantId;
     private String name;
     private String email;
+    private String baseCurrency;
 
     @JsonIgnore
     private String password;
