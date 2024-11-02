@@ -33,4 +33,9 @@ public class TenantContext {
         var user = getUserLoggedByToken();
         return user.getUsername();
     }
+
+    public static String getTenantBaseCurrency() {
+        var user = getUserLoggedByToken();
+        return user.getBaseCurrency();
+    }
 }
