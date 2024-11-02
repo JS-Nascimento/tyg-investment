@@ -2,6 +2,7 @@ package br.dev.jstec.tyginvestiment.controllers;
 
 import br.dev.jstec.tyginvestiment.dto.BaseCurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
+import br.dev.jstec.tyginvestiment.dto.currencies.CurrencyDataDto;
 import br.dev.jstec.tyginvestiment.dto.currencies.CurrencyQuotationHistoryDto;
 import br.dev.jstec.tyginvestiment.services.handlers.CurrencyHandler;
 import lombok.RequiredArgsConstructor;
@@ -38,5 +39,12 @@ public class CurrencyController {
                                                                                 @RequestParam(defaultValue = "30") int limit) {
         var history = handler.getHistoryByCodeWithLimit(code, limit);
         return ResponseEntity.ok(history);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<CurrencyDataDto>> getCurrencyList() {
+
+        var list = handler.getExchangeList();
+        return ResponseEntity.ok(list);
     }
 }

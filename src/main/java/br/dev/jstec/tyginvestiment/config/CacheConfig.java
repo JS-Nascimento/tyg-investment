@@ -7,8 +7,7 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.*;
 
 @Configuration
 @EnableCaching
@@ -27,6 +26,11 @@ public class CacheConfig {
                         .initialCapacity(100)
                         .maximumSize(500)
                         .expireAfterAccess(10, MINUTES));
+
+        cacheManager.registerCustomCache("exchange-list",
+                Caffeine.newBuilder()
+                        .expireAfterAccess(1, DAYS)
+                        .build());
         return cacheManager;
     }
 }

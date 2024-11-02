@@ -1,7 +1,9 @@
 package br.dev.jstec.tyginvestiment.services.handlers;
 
+import br.dev.jstec.tyginvestiment.clients.CurrencyClient;
 import br.dev.jstec.tyginvestiment.dto.BaseCurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
+import br.dev.jstec.tyginvestiment.dto.currencies.CurrencyDataDto;
 import br.dev.jstec.tyginvestiment.dto.currencies.CurrencyQuotationHistoryDto;
 import br.dev.jstec.tyginvestiment.exception.BusinessException;
 import br.dev.jstec.tyginvestiment.repository.CurrencyTargetRepository;
@@ -9,15 +11,14 @@ import br.dev.jstec.tyginvestiment.services.mappers.CurrencyMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Currency;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
+import static br.dev.jstec.tyginvestiment.config.security.TenantContext.getTenantBaseCurrency;
 import static br.dev.jstec.tyginvestiment.exception.BusinessErrorMessage.CURRENCY_NOT_FOUND;
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -30,10 +31,7 @@ public class CurrencyHandler {
     private final CurrencyTargetRepository currencyRepository;
     private final ConversionRateHandler conversionRateHandler;
     private final CurrencyMapper mapper;
-
-    @Getter
-    @Value("${app.config.currency-base}")
-    private String currencyBase;
+    private final CurrencyClient client;
 
     @Getter
     @Value("${app.config.decimal-places}")
@@ -53,7 +51,7 @@ public class CurrencyHandler {
         var entity = mapper.toEntity(dto);
         var saved = currencyRepository.save(entity);
 
-        conversionRateHandler.saveConversionRate(saved, currencyBase);
+        conversionRateHandler.saveConversionRate(saved, getTenantBaseCurrency());
 
         return getBaseCurrency();
     }
@@ -63,7 +61,7 @@ public class CurrencyHandler {
 
         var currency = currencyRepository.findAll();
 
-        var baseCurrency = Currency.getInstance(currencyBase);
+        var baseCurrency = Currency.getInstance(getTenantBaseCurrency());
 
         var dto = new BaseCurrencyDto();
         dto.setCode(baseCurrency.getCurrencyCode());
@@ -77,7 +75,7 @@ public class CurrencyHandler {
                     currencyDto.setSymbol(c.getSymbol());
                     currencyDto.setDecimalPlaces(c.getDecimalPlaces());
                     currencyDto.setConversionRate(
-                            conversionRateHandler.findLastRateToConversion(currencyBase, c.getId()));
+                            conversionRateHandler.findLastRateToConversion(getTenantBaseCurrency(), c.getId()));
                     return currencyDto;
                 })
                 .toList());
@@ -89,7 +87,7 @@ public class CurrencyHandler {
     public void updateCurrency() {
         var currencies = new HashSet<>(currencyRepository.findAll());
 
-        conversionRateHandler.updateConversionRate(currencies, currencyBase);
+        conversionRateHandler.updateConversionRate(currencies, getTenantBaseCurrency());
     }
 
     @Transactional(readOnly = true)
@@ -144,5 +142,27 @@ public class CurrencyHandler {
                         tuple.get(3, Date.class)
                 ))
                 .toList();
+    }
+
+    @Cacheable(value = "exchange-list")
+    public List<CurrencyDataDto> getExchangeList() {
+
+        var response = client.getExchangeList();
+        List<CurrencyDataDto> currencies = new ArrayList<>();
+
+        if (response instanceof Map) {
+            Map<?, ?> responseMap = (Map<?, ?>) response;
+            List<List<String>> supportedCodes = (List<List<String>>) responseMap.get("supported_codes");
+            if (supportedCodes != null) {
+                for (List<String> currencyPair : supportedCodes) {
+                    if (currencyPair.size() == 2) {
+                        String code = currencyPair.get(0);
+                        String description = currencyPair.get(1);
+                        currencies.add(new CurrencyDataDto(code, description));
+                    }
+                }
+            }
+        }
+        return currencies;
     }
 }
