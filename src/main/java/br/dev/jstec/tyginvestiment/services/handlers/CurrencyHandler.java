@@ -10,6 +10,7 @@ import br.dev.jstec.tyginvestiment.repository.CurrencyTargetRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.CurrencyMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CurrencyHandler {
 
     private final CurrencyTargetRepository currencyRepository;
@@ -51,6 +53,15 @@ public class CurrencyHandler {
         if (currencyExist.isPresent()) {
             return getBaseCurrency();
         }
+
+        if (isNull(dto.getDecimalPlaces())) {
+            dto.setDecimalPlaces(decimalPlaces);
+        }
+
+        dto.setCurrencyBase(false);
+        dto.setCode(currency.getCurrencyCode());
+        dto.setName(currency.getDisplayName(Locale.getDefault()));
+        dto.setSymbol(currency.getSymbol(Locale.getDefault()));
 
         var entity = mapper.toEntity(dto);
         var saved = currencyRepository.save(entity);
@@ -150,23 +161,41 @@ public class CurrencyHandler {
 
     @Cacheable(value = "exchange-list")
     public List<CurrencyDataDto> getExchangeList() {
-
         var response = client.getExchangeList();
-        List<CurrencyDataDto> currencies = new ArrayList<>();
 
-        if (response instanceof Map) {
-            Map<?, ?> responseMap = (Map<?, ?>) response;
-            List<List<String>> supportedCodes = (List<List<String>>) responseMap.get("supported_codes");
-            if (supportedCodes != null) {
-                for (List<String> currencyPair : supportedCodes) {
-                    if (currencyPair.size() == 2) {
-                        String code = currencyPair.get(0);
-                        String description = currencyPair.get(1);
-                        currencies.add(new CurrencyDataDto(code, description));
-                    }
-                }
-            }
+        if (!(response instanceof Map<?, ?> responseMap)) {
+            return Collections.emptyList();
         }
-        return currencies;
+
+
+        List<List<String>> supportedCodes = (List<List<String>>) responseMap.get("supported_codes");
+
+        return Optional.ofNullable(supportedCodes)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(this::createCurrencyData)
+                .filter(Objects::nonNull)
+                .toList(); // Converte para lista
+    }
+
+    private CurrencyDataDto createCurrencyData(List<String> currencyPair) {
+        if (currencyPair.size() < 2) {
+            return null;
+        }
+
+        try {
+            String code = currencyPair.get(0);
+            Currency systemCurrency = Currency.getInstance(code);
+            String description = systemCurrency.getDisplayName(Locale.getDefault());
+
+            log.info("Currency code: {}, description: {}", code, description);
+
+            return new CurrencyDataDto(code, description);
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().contains("The input currency code is not a valid ISO 4217 code")) {
+                log.warn("Código de moeda inválido: {}", currencyPair.get(0));
+            }
+            return null;
+        }
     }
 }
