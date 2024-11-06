@@ -37,6 +37,10 @@ public class CurrencyHandler {
     @Value("${app.config.decimal-places}")
     private Integer decimalPlaces;
 
+    @Getter
+    @Value("${app.config.currency-base}")
+    private String currencyBaseDefault;
+
     @Transactional
     public BaseCurrencyDto saveCurrency(CurrencyDto dto) {
 
@@ -87,7 +91,7 @@ public class CurrencyHandler {
     public void updateCurrency() {
         var currencies = new HashSet<>(currencyRepository.findAll());
 
-        conversionRateHandler.updateConversionRate(currencies, getTenantBaseCurrency());
+        conversionRateHandler.updateConversionRate(currencies, currencyBaseDefault);
     }
 
     @Transactional(readOnly = true)
