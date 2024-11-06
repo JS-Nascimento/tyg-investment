@@ -14,8 +14,8 @@ public class CurrencyJobService {
 
     private final CurrencyHandler currencyHandler;
 
-    @Scheduled(cron = "0 0/1 * * * ?")
-//    @Scheduled(cron = "0 0 6-22/8 ? * MON-FRI")
+    //    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0 6-22/8 ? * MON-FRI")
     @Async
     public void updateCurrencyRateConversion() {
         currencyHandler.updateCurrency();
