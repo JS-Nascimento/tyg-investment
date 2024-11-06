@@ -8,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import static br.dev.jstec.tyginvestiment.config.security.TenantContext.getTenantBaseCurrency;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -23,7 +21,7 @@ public class CurrencyAdapter {
 
     public ExchangeRateApiResponse getLiveRates() {
 
-        return currencyClient.getLiveExchangeRates(getTenantBaseCurrency());
+        return currencyClient.getLiveExchangeRates(baseCurrency);
     }
 
 }
