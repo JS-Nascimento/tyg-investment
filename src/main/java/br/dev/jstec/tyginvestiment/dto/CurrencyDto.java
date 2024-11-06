@@ -1,8 +1,10 @@
 package br.dev.jstec.tyginvestiment.dto;
 
 import lombok.Data;
+import lombok.Getter;
 
 @Data
+@Getter
 public class CurrencyDto {
 
 
@@ -12,7 +14,7 @@ public class CurrencyDto {
 
     private String symbol;
 
-    private int decimalPlaces;
+    private Integer decimalPlaces;
 
     private boolean currencyBase;
 

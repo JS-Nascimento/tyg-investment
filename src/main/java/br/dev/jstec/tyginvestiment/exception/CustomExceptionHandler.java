@@ -153,7 +153,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ResponseErrorMessage> handleRunException(RuntimeException ex) {
 
-        log.error(ERRO_NAO_IMPLEMENTADO.getMsg(), ex.getMessage());
+        log.error(format(ERRO_NAO_IMPLEMENTADO.getMsg(), ex.getMessage()));
         return status(BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(ResponseErrorMessage.builder()
