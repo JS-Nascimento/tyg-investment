@@ -73,6 +73,8 @@ app:
     secret:
       key: ${JWT_SECRET_KEY:f08f886246187173b0caa392ad8b3512}
   config:
+    locale: pt-BR
+    TZ: America/Sao Paulo
     currency-base: BRL
     decimal-places: 4
 
