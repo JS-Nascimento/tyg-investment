@@ -36,6 +36,10 @@ public class CurrencyHandler {
     private final CurrencyClient client;
 
     @Getter
+    @Value("${app.config.locale}")
+    private String userLocale;
+
+    @Getter
     @Value("${app.config.decimal-places}")
     private Integer decimalPlaces;
 
@@ -111,7 +115,7 @@ public class CurrencyHandler {
     }
 
     @Transactional(readOnly = true)
-    public boolean exists(String code) {
+    public Boolean exists(String code) {
         return currencyRepository.existsByCode(code);
     }
 
@@ -175,7 +179,8 @@ public class CurrencyHandler {
                 .stream()
                 .map(this::createCurrencyData)
                 .filter(Objects::nonNull)
-                .toList(); // Converte para lista
+                .filter(currency -> !this.exists(currency.getCode()))
+                .toList();
     }
 
     private CurrencyDataDto createCurrencyData(List<String> currencyPair) {
@@ -184,16 +189,16 @@ public class CurrencyHandler {
         }
 
         try {
-            String code = currencyPair.get(0);
+            String code = currencyPair.getFirst();
             Currency systemCurrency = Currency.getInstance(code);
-            String description = systemCurrency.getDisplayName(Locale.getDefault());
+            String description = systemCurrency.getDisplayName(Locale.of(userLocale));
 
             log.info("Currency code: {}, description: {}", code, description);
 
             return new CurrencyDataDto(code, description);
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("The input currency code is not a valid ISO 4217 code")) {
-                log.warn("Código de moeda inválido: {}", currencyPair.get(0));
+                log.warn("Código de moeda inválido: {}", currencyPair.getFirst());
             }
             return null;
         }
