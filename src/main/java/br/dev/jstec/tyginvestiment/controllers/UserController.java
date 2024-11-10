@@ -2,6 +2,7 @@ package br.dev.jstec.tyginvestiment.controllers;
 
 import br.dev.jstec.tyginvestiment.dto.user.ChangePasswordDto;
 import br.dev.jstec.tyginvestiment.dto.user.UserDto;
+import br.dev.jstec.tyginvestiment.dto.user.UserSettingsDto;
 import br.dev.jstec.tyginvestiment.services.handlers.UserHandler;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -44,5 +45,11 @@ public class UserController {
 
         handler.changePassword(id, dto);
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/settings/{tenantId}")
+    public ResponseEntity<UserDto> updateUserSettings(@PathVariable UUID tenantId, @RequestBody UserSettingsDto dto) {
+        var user = handler.saveUserSettings(tenantId, dto);
+        return ResponseEntity.ok(user);
     }
 }
