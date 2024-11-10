@@ -2,6 +2,7 @@ package br.dev.jstec.tyginvestiment.dto.user;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,4 +24,7 @@ public class UserDto {
     private boolean enabled;
     private boolean accountNonExpired;
     private boolean isAccountNonLocked;
+
+    @JsonProperty("settings")
+    private UserSettingsDto userSettings;
 }

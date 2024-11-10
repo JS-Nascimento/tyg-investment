@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+import static jakarta.persistence.CascadeType.ALL;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -45,6 +47,9 @@ public class User extends Auditable<Long> {
 
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean isAccountNonLocked = true;
+
+    @OneToOne(mappedBy = "user", cascade = ALL)
+    private UserSettings userSettings;
 
     @PrePersist
     protected void onCreate() {

@@ -31,6 +31,11 @@ public class CacheConfig {
                 Caffeine.newBuilder()
                         .expireAfterAccess(1, DAYS)
                         .build());
+
+        cacheManager.registerCustomCache("zoneTimeList",
+                Caffeine.newBuilder()
+                        .expireAfterAccess(10, DAYS)
+                        .build());
         return cacheManager;
     }
 }

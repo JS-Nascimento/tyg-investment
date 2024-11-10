@@ -171,7 +171,6 @@ public class CurrencyHandler {
             return Collections.emptyList();
         }
 
-
         List<List<String>> supportedCodes = (List<List<String>>) responseMap.get("supported_codes");
 
         return Optional.ofNullable(supportedCodes)
@@ -179,7 +178,6 @@ public class CurrencyHandler {
                 .stream()
                 .map(this::createCurrencyData)
                 .filter(Objects::nonNull)
-                .filter(currency -> !this.exists(currency.getCode()))
                 .toList();
     }
 
@@ -191,7 +189,7 @@ public class CurrencyHandler {
         try {
             String code = currencyPair.getFirst();
             Currency systemCurrency = Currency.getInstance(code);
-            String description = systemCurrency.getDisplayName(Locale.of(userLocale));
+            String description = systemCurrency.getDisplayName(Locale.forLanguageTag(userLocale));
 
             log.info("Currency code: {}, description: {}", code, description);
 
