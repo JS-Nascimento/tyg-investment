@@ -8,10 +8,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserSettingsMapper {
 
-    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "userId", source = "user.tenantId")
     UserSettingsDto toDto(UserSettings entity);
 
-    @Mapping(target = "user.id", source = "userId")
+    @Mapping(target = "user.tenantId", source = "userId")
     UserSettings toEntity(UserSettingsDto dto);
 
     default UserSettings updateEntityFromDto(UserSettingsDto dto, UserSettings entity) {

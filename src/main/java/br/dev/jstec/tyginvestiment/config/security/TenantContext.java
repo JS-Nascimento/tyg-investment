@@ -1,12 +1,15 @@
 package br.dev.jstec.tyginvestiment.config.security;
 
 import br.dev.jstec.tyginvestiment.exception.RequestException;
+import br.dev.jstec.tyginvestiment.models.UserCurrencies;
+import br.dev.jstec.tyginvestiment.models.UserSettings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.INVALID_TOKEN;
@@ -26,7 +29,12 @@ public class TenantContext {
 
     public static UUID getTenant() {
         var user = getUserLoggedByToken();
-        return UUID.fromString(user.getId());
+        return UUID.fromString(user.getTenantId());
+    }
+
+    public static Long getTenantId() {
+        var user = getUserLoggedByToken();
+        return user.getId();
     }
 
     public static String getTenantUsername() {
@@ -34,8 +42,13 @@ public class TenantContext {
         return user.getUsername();
     }
 
-    public static String getTenantBaseCurrency() {
+    public static UserSettings getTenantSettings() {
         var user = getUserLoggedByToken();
-        return user.getBaseCurrency();
+        return user.getSettings();
+    }
+
+    public static List<UserCurrencies> getTenantCurrencies() {
+        var user = getUserLoggedByToken();
+        return user.getCurrencies();
     }
 }

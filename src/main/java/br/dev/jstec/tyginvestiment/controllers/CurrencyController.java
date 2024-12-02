@@ -1,6 +1,5 @@
 package br.dev.jstec.tyginvestiment.controllers;
 
-import br.dev.jstec.tyginvestiment.dto.BaseCurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.currencies.CurrencyDataDto;
 import br.dev.jstec.tyginvestiment.dto.currencies.CurrencyQuotationHistoryDto;
@@ -21,16 +20,16 @@ public class CurrencyController {
     private final CurrencyHandler handler;
 
     @PostMapping
-    public ResponseEntity<BaseCurrencyDto> saveCurrency(@RequestBody CurrencyDto dto) {
+    public ResponseEntity<CurrencyDto> saveCurrency(@RequestBody CurrencyDto dto) {
 
         var currency = handler.saveCurrency(dto);
 
         return ResponseEntity.status(201).body(currency);
     }
 
-    @GetMapping
-    public ResponseEntity<BaseCurrencyDto> getCurrency() {
-        var currency = handler.getBaseCurrency();
+    @GetMapping("/{code}")
+    public ResponseEntity<CurrencyDto> getCurrency(@PathVariable String code) {
+        var currency = handler.getCurrencyDto(code);
         return ResponseEntity.ok(currency);
     }
 

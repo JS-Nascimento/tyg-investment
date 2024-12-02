@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import static br.dev.jstec.tyginvestiment.config.security.TenantContext.getTenantSettings;
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.INVALID_CONVERSION_RATE;
 
 @Component
@@ -28,7 +29,7 @@ public class ConversionRateHandler {
     @Transactional
     public void saveConversionRate(Currency currency, String currencyBase) {
 
-        var response = currencyAdapter.getLiveRates();
+        var response = currencyAdapter.getLiveRates(getTenantSettings().getBaseCurrency());
 
         var rate = response.getConversionRates().get(currency.getCode());
 
@@ -49,13 +50,13 @@ public class ConversionRateHandler {
     public ConversionRateDto findLastRateToConversion(String sourceCurrency, Long targetCurrencyId) {
         return conversionRatesRepository.findLastConversionRate(sourceCurrency, targetCurrencyId)
                 .map(cr -> new ConversionRateDto(cr.getRate(), cr.getRateDate()))
-                .orElseThrow(() -> new InfrastructureException(INVALID_CONVERSION_RATE, sourceCurrency));
+                .orElse(new ConversionRateDto(0.00, LocalDateTime.now()));
     }
 
     @Transactional
     public void updateConversionRate(Set<Currency> targets, String currencyBase) {
 
-        var response = currencyAdapter.getLiveRates();
+        var response = currencyAdapter.getLiveRates(getTenantSettings().getBaseCurrency());
 
         targets.forEach(target -> {
             var rate = response.getConversionRates().get(target.getCode());

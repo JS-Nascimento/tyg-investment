@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 import static jakarta.persistence.CascadeType.ALL;
@@ -36,9 +37,6 @@ public class User extends Auditable<Long> {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false, length = 4)
-    private String baseCurrency;
-
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean enabled = true;
 
@@ -50,6 +48,9 @@ public class User extends Auditable<Long> {
 
     @OneToOne(mappedBy = "user", cascade = ALL)
     private UserSettings userSettings;
+
+    @OneToMany(mappedBy = "user", cascade = ALL)
+    private List<UserCurrencies> userCurrencies;
 
     @PrePersist
     protected void onCreate() {
