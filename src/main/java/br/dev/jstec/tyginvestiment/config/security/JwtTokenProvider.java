@@ -31,7 +31,7 @@ public class JwtTokenProvider {
         var validity = new Date(now.getTime() + duration);
 
         return Jwts.builder()
-                .subject(userDetails.getId())
+                .subject(userDetails.getTenantId())
                 .claim("preferred_username", ((CustomUserDetails) userDetails).getUsername())
                 .issuedAt(now)
                 .expiration(validity)

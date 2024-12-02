@@ -4,11 +4,13 @@ package br.dev.jstec.tyginvestiment.dto.user;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 public class UserSettingsDto {
 
-    private Long userId;
+    private UUID userId;
 
     private Long id;
     private String locale;

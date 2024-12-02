@@ -1,6 +1,8 @@
 package br.dev.jstec.tyginvestiment.config.security;
 
 import br.dev.jstec.tyginvestiment.models.User;
+import br.dev.jstec.tyginvestiment.models.UserCurrencies;
+import br.dev.jstec.tyginvestiment.models.UserSettings;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Getter
 @Setter
@@ -33,8 +36,12 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 
-    public String getId() {
+    public String getTenantId() {
         return user.getTenantId().toString();
+    }
+
+    public Long getId() {
+        return user.getId();
     }
 
     @Override
@@ -48,7 +55,15 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public String getBaseCurrency() {
-        return user.getBaseCurrency();
+        return user.getUserSettings().getBaseCurrency();
+    }
+
+    public UserSettings getSettings() {
+        return user.getUserSettings();
+    }
+
+    public List<UserCurrencies> getCurrencies() {
+        return user.getUserCurrencies();
     }
 
     @Override

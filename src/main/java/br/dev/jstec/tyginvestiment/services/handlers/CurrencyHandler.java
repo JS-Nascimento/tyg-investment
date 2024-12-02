@@ -1,17 +1,17 @@
 package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.clients.CurrencyClient;
-import br.dev.jstec.tyginvestiment.dto.BaseCurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.currencies.CurrencyDataDto;
 import br.dev.jstec.tyginvestiment.dto.currencies.CurrencyQuotationHistoryDto;
 import br.dev.jstec.tyginvestiment.exception.BusinessException;
+import br.dev.jstec.tyginvestiment.models.UserCurrencies;
 import br.dev.jstec.tyginvestiment.repository.CurrencyTargetRepository;
+import br.dev.jstec.tyginvestiment.repository.UserCurrenciesRepository;
+import br.dev.jstec.tyginvestiment.repository.UserRepository;
 import br.dev.jstec.tyginvestiment.services.mappers.CurrencyMapper;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
@@ -19,9 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-import static br.dev.jstec.tyginvestiment.config.security.TenantContext.getTenantBaseCurrency;
+import static br.dev.jstec.tyginvestiment.config.security.TenantContext.getTenant;
+import static br.dev.jstec.tyginvestiment.config.security.TenantContext.getTenantSettings;
 import static br.dev.jstec.tyginvestiment.exception.BusinessErrorMessage.CURRENCY_NOT_FOUND;
+import static br.dev.jstec.tyginvestiment.exception.BusinessErrorMessage.USER_NOT_FOUND;
+import static java.util.Locale.forLanguageTag;
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 
@@ -34,79 +38,87 @@ public class CurrencyHandler {
     private final ConversionRateHandler conversionRateHandler;
     private final CurrencyMapper mapper;
     private final CurrencyClient client;
-
-    @Getter
-    @Value("${app.config.locale}")
-    private String userLocale;
-
-    @Getter
-    @Value("${app.config.decimal-places}")
-    private Integer decimalPlaces;
-
-    @Getter
-    @Value("${app.config.currency-base}")
-    private String currencyBaseDefault;
+    private final UserRepository userRepository;
+    private final UserCurrenciesRepository userCurrenciesRepository;
 
     @Transactional
-    public BaseCurrencyDto saveCurrency(CurrencyDto dto) {
+    public CurrencyDto saveCurrency(CurrencyDto dto) {
 
         validateCurrency(dto);
         var currency = Currency.getInstance(dto.getCode());
 
-        var currencyExist = currencyRepository.findByCode(currency.getCurrencyCode());
-        if (currencyExist.isPresent()) {
-            return getBaseCurrency();
+        var currencyExist = currencyRepository.findByCode(currency.getCurrencyCode())
+                .stream()
+                .findFirst()
+                .orElse(saveCurrency(dto, false));
+
+        var user = userRepository.findByTenantId(getTenant())
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
+
+
+        var currencyFound = user.getUserCurrencies().stream()
+                .filter(userCurrency -> userCurrency.getCurrency().getCode().equals(currencyExist.getCode()))
+                .findFirst()
+                .map(UserCurrencies::getCurrency)
+                .map(mapper::toDto)
+                .orElse(null);
+
+        if (nonNull(currencyFound)) {
+            return currencyFound;
         }
+
+        var userCurrency = new UserCurrencies();
+        userCurrency.setUser(user);
+        userCurrency.setCurrency(currencyExist);
+        userCurrency.setActive(true);
+
+        var currencySaved = userCurrenciesRepository.save(userCurrency);
+        return mapper.toDto(currencySaved.getCurrency());
+    }
+
+    private br.dev.jstec.tyginvestiment.models.Currency saveCurrency(CurrencyDto dto, boolean isBase) {
+
+        var currency = Currency.getInstance(dto.getCode());
 
         if (isNull(dto.getDecimalPlaces())) {
-            dto.setDecimalPlaces(decimalPlaces);
+            dto.setDecimalPlaces(getTenantSettings().getDecimalPlaces());
         }
 
-        dto.setCurrencyBase(false);
+        var locale = isBlank(getTenantSettings().getLocale()) ? Locale.getDefault() : forLanguageTag(getTenantSettings().getLocale());
+
+        dto.setCurrencyBase(isBase);
         dto.setCode(currency.getCurrencyCode());
-        dto.setName(currency.getDisplayName(Locale.getDefault()));
-        dto.setSymbol(currency.getSymbol(Locale.getDefault()));
+        dto.setName(currency.getDisplayName(locale));
+        dto.setSymbol(currency.getSymbol(locale));
 
         var entity = mapper.toEntity(dto);
         var saved = currencyRepository.save(entity);
 
-        conversionRateHandler.saveConversionRate(saved, getTenantBaseCurrency());
+        conversionRateHandler
+                .saveConversionRate(saved, getTenantSettings().getBaseCurrency());
 
-        return getBaseCurrency();
+        return saved;
     }
 
     @Transactional(readOnly = true)
-    public BaseCurrencyDto getBaseCurrency() {
+    public CurrencyDto getCurrencyDto(String code) {
 
-        var currency = currencyRepository.findAll();
+        if (isBlank(code)) {
+            throw new BusinessException(CURRENCY_NOT_FOUND);
+        }
 
-        var baseCurrency = Currency.getInstance(getTenantBaseCurrency());
-
-        var dto = new BaseCurrencyDto();
-        dto.setCode(baseCurrency.getCurrencyCode());
-        dto.setName(baseCurrency.getDisplayName());
-        dto.setSymbol(baseCurrency.getSymbol());
-        dto.setCurrencies(currency.stream()
-                .map(c -> {
-                    var currencyDto = new CurrencyDto();
-                    currencyDto.setCode(c.getCode());
-                    currencyDto.setName(c.getName());
-                    currencyDto.setSymbol(c.getSymbol());
-                    currencyDto.setDecimalPlaces(c.getDecimalPlaces());
-                    currencyDto.setConversionRate(
-                            conversionRateHandler.findLastRateToConversion(getTenantBaseCurrency(), c.getId()));
-                    return currencyDto;
-                })
-                .toList());
-
-        return dto;
+        return currencyRepository.findByCode(code)
+                .map(mapper::toDto)
+                .orElseThrow(() -> new BusinessException(CURRENCY_NOT_FOUND));
     }
 
     @Transactional
     public void updateCurrency() {
         var currencies = new HashSet<>(currencyRepository.findAll());
 
-        conversionRateHandler.updateConversionRate(currencies, currencyBaseDefault);
+        conversionRateHandler.updateConversionRate(currencies, getTenantSettings().getBaseCurrency());
     }
 
     @Transactional(readOnly = true)
@@ -134,7 +146,7 @@ public class CurrencyHandler {
             currencyDto.setCode(currency.getCurrencyCode());
             currencyDto.setName(currency.getDisplayName());
             currencyDto.setSymbol(currency.getSymbol());
-            currencyDto.setDecimalPlaces(decimalPlaces);
+            currencyDto.setDecimalPlaces(getTenantSettings().getDecimalPlaces());
             currencyDto.setCurrencyBase(false);
 
             saveCurrency(currencyDto);
@@ -189,7 +201,7 @@ public class CurrencyHandler {
         try {
             String code = currencyPair.getFirst();
             Currency systemCurrency = Currency.getInstance(code);
-            String description = systemCurrency.getDisplayName(Locale.forLanguageTag(userLocale));
+            String description = systemCurrency.getDisplayName(forLanguageTag(getTenantSettings().getLocale()));
 
             log.info("Currency code: {}, description: {}", code, description);
 
