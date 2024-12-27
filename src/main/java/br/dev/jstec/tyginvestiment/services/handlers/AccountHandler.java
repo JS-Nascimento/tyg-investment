@@ -28,16 +28,16 @@ public class AccountHandler {
 
     private final AccountRepository accountRepository;
     private final AccountHoldingRepository accountHoldingRepository;
-    private final AccountMapper mapper;
+    private final AccountMapper accountMapper;
 
     @Transactional
     public AccountDto saveAccount(AccountDto dto) {
 
-        var entity = mapper.toEntity(dto);
+        var entity = accountMapper.toEntity(dto);
 
         var account = accountRepository.save(entity);
 
-        return mapper.toDto(account);
+        return accountMapper.toDto(account);
     }
 
     @Transactional(readOnly = true)
@@ -45,7 +45,7 @@ public class AccountHandler {
         var account = accountRepository
                 .findById(id)
                 .orElseThrow(() -> new InfrastructureException(ErrorMessage.ACCOUNT_NOT_FOUND, String.valueOf(id)));
-        return mapper.toDto(account);
+        return accountMapper.toDto(account);
     }
 
     @Transactional(readOnly = true)
@@ -58,7 +58,7 @@ public class AccountHandler {
 
         var investments = getInvestments(id);
 
-        return mapper.toInvestmentSummaryStatementDto(account, investments);
+        return accountMapper.toInvestmentSummaryStatementDto(account, investments);
     }
 
     @Transactional(readOnly = true)

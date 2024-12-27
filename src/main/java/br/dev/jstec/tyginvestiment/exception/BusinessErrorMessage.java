@@ -20,6 +20,10 @@ public enum BusinessErrorMessage {
     OLD_PASSWORD_NOT_MATCH(12, "Senha atual não confere."),
     NEW_PASSWORD_NOT_MATCH(13, "Nova senha e confirmação não conferem"),
     CURRENCY_NOT_FOUND(14, "Moeda não encontrada"),
+    ASSET_NOT_FOUND(15, "Ativo não encontrado"),
+    ASSET_TYPE_REQUIRED(16, "Tipo de ativo é obrigatório"),
+    ASSET_MARKET_LOCATION_REQUIRED(17, "Localização do ativo é obrigatória"),
+    ASSET_SYMBOL_REQUIRED(18, "Ticker do ativo é obrigatório"),
     ;
 
     private final int code;

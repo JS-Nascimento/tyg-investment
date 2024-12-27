@@ -1,15 +1,17 @@
-package br.dev.jstec.tyginvestiment.services.handlers;
+package br.dev.jstec.tyginvestiment.services.handlers.assets;
 
 import br.dev.jstec.tyginvestiment.clients.AlphaClient;
-import br.dev.jstec.tyginvestiment.clients.dto.AlphaVantageClient;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
+import br.dev.jstec.tyginvestiment.enums.AssetMarketLocation;
 import br.dev.jstec.tyginvestiment.events.AssetSavedEvent;
 import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.models.Stock;
 import br.dev.jstec.tyginvestiment.repository.StockRepository;
+import br.dev.jstec.tyginvestiment.services.handlers.AssetHistoryHandler;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
-import lombok.RequiredArgsConstructor;
+import br.dev.jstec.tyginvestiment.services.strategy.AssetStrategy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -20,78 +22,64 @@ import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ATTRIBUTE_NOT_F
 import static br.dev.jstec.tyginvestiment.services.validators.AssetBussinessRulesValidator.validateClientApiResponse;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Component("STOCK")
-@RequiredArgsConstructor
 @Slf4j
-public class StockHandler implements AssetHandler<Stock, StockDto> {
+public class StockHandler implements AssetStrategy {
 
-    private final AssetMapper mapper;
-    private final StockRepository stockRepository;
-    private final AlphaClient alphaClient;
-    private final ApplicationEventPublisher publisher;
-
-    private final AssetHistoryHandler assetHistoryHandler;
+    @Autowired
+    private AssetMapper assetMapper;
+    @Autowired
+    private StockRepository stockRepository;
+    @Autowired
+    private AlphaClient alphaClient;
+    @Autowired
+    private ApplicationEventPublisher publisher;
+    @Autowired
+    private AssetHistoryHandler assetHistoryHandler;
 
     @Value("${alpha-vantage.api-key}")
     private String apiKey;
 
     @Override
     @Transactional
-    public StockDto save(String symbol) {
+    public StockDto save(AssetMarketLocation marketLocation, String symbol) {
 
-        if (isBlank(symbol)) {
-            throw new InfrastructureException(ATTRIBUTE_NOT_FOUND, symbol);
-        }
-
-        var asset = getAsset(symbol);
+        var asset = getAsset(marketLocation, symbol);
 
         if (isNull(asset)) {
             throw new InfrastructureException(ASSET_NOT_FOUND, symbol);
         }
 
-        var entity = mapper.toEntity(asset);
-
-        var entitySaved = stockRepository.save(entity);
+        var entitySaved = stockRepository.save(asset);
 
         if (nonNull(entitySaved.getSymbol())) {
             publisher.publishEvent(new AssetSavedEvent(this, entitySaved));
         }
 
-        return mapper.toDto(entitySaved);
+        return assetMapper.toDto(entitySaved);
     }
 
-    @Override
-    public StockDto save(String symbol, String currency) {
-        throw new UnsupportedOperationException("Stock does not have currency");
-    }
 
-    @Override
     @Transactional(readOnly = true)
     public StockDto findById(String symbol) {
         return stockRepository.findById(symbol)
-                .map(mapper::toDto)
+                .map(assetMapper::toDto)
                 .orElseThrow(() -> new InfrastructureException(ASSET_NOT_FOUND, symbol));
     }
 
-    @Override
-    public StockDto save(StockDto dto) {
-        throw new UnsupportedOperationException("Stock does not have currency");
-    }
 
-    @Transactional
-    public AlphaVantageClient getAsset(String symbol) {
+    private Stock getAsset(AssetMarketLocation marketLocation, String symbol) {
 
-        var asset = alphaClient.getAssetInfo(symbol, apiKey);
-
-        validateClientApiResponse(asset);
-
-        if (isNull(asset) || isBlank(asset.getSymbol())) {
-            throw new InfrastructureException(ASSET_NOT_FOUND, symbol);
+        switch (marketLocation) {
+            case BR:
+                return assetMapper.toEntity(alphaClient.getAssetInfo(symbol, apiKey));
+            case US:
+                var asset = alphaClient.getAssetInfo(symbol, apiKey);
+                validateClientApiResponse(asset);
+                return assetMapper.toEntity(asset);
+            default:
+                throw new InfrastructureException(ATTRIBUTE_NOT_FOUND, "marketLocation");
         }
-
-        return asset;
     }
-
 }

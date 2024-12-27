@@ -1,6 +1,6 @@
 package br.dev.jstec.tyginvestiment.jobs;
 
-import br.dev.jstec.tyginvestiment.services.handlers.CurrencyHandler;
+import br.dev.jstec.tyginvestiment.services.handlers.assets.CurrencyHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;

@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
-        name = "user_currencies",
-        indexes = {
-                @Index(name = "idx_user", columnList = "userId")
-        })
+        name = "user_currencies")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
