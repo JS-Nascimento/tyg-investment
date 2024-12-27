@@ -67,6 +67,19 @@ logging:
           openfeign: debug
     feign:
       client: debug
+resilience4j:
+  circuitbreaker:
+    instances:
+      apiClient:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5000ms
+        permittedNumberOfCallsInHalfOpenState: 3
+  retry:
+    instances:
+      apiClient:
+        maxAttempts: 3
+        waitDuration: 1s
 
 app:
   jwt:

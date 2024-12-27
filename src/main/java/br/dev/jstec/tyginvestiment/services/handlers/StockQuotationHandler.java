@@ -24,7 +24,7 @@ public class StockQuotationHandler {
     private final AssetRepository assetRepository;
     private final AlphaClient alphaClient;
     private final GeckoCoinClient geckoClient;
-    private final AssetQuotationMapper mapper;
+    private final AssetQuotationMapper assetQuotationMapper;
 
     @Value("${alpha-vantage.api-key}")
     private String apiKey;
@@ -41,7 +41,7 @@ public class StockQuotationHandler {
                 var cryptoQuotation = geckoClient.getCryptoSimplePrice(asset.getName().toLowerCase(), asset.getCurrency());
 
                 if (cryptoQuotation != null) {
-                    stockQuotationRepository.saveAndFlush(mapper.toCryptoQuotation(cryptoQuotation, asset));
+                    stockQuotationRepository.saveAndFlush(assetQuotationMapper.toCryptoQuotation(cryptoQuotation, asset));
                     log.info("Cotação da criptomoeda {} atualizada com sucesso", asset.getSymbol());
                 }
             } else {
@@ -50,7 +50,7 @@ public class StockQuotationHandler {
 
                 var stockQuotation = alphaClient.getGlobalQuote(asset.getSymbol(), apiKey);
                 if (stockQuotation != null) {
-                    stockQuotationRepository.saveAndFlush(mapper.toStockQuotation(stockQuotation.getGlobalQuote(), asset));
+                    stockQuotationRepository.saveAndFlush(assetQuotationMapper.toStockQuotation(stockQuotation.getGlobalQuote(), asset));
                     log.info("Cotação da ação {} atualizada com sucesso", asset.getSymbol());
                 }
             }

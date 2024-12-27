@@ -9,10 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-@Table(name = "users_settings",
-        indexes = {
-                @Index(name = "idx_user", columnList = "userId")
-        })
+@Table(name = "users_settings")
 public class UserSettings {
 
     @Id

@@ -14,11 +14,7 @@ import static jakarta.persistence.CascadeType.ALL;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "users",
-        indexes = {
-                @Index(name = "idx_tenant", columnList = "tenantId"),
-                @Index(name = "idx_email", columnList = "email")
-        })
+@Table(name = "users")
 public class User extends Auditable<Long> {
 
     @Id

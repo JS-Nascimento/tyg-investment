@@ -3,9 +3,10 @@ package br.dev.jstec.tyginvestiment.controllers;
 import br.dev.jstec.tyginvestiment.dto.assetstype.CryptoDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
-import br.dev.jstec.tyginvestiment.services.handlers.CryptoHandler;
-import br.dev.jstec.tyginvestiment.services.handlers.FundHandler;
-import br.dev.jstec.tyginvestiment.services.handlers.StockHandler;
+import br.dev.jstec.tyginvestiment.enums.AssetMarketLocation;
+import br.dev.jstec.tyginvestiment.services.handlers.assets.CryptoHandler;
+import br.dev.jstec.tyginvestiment.services.handlers.assets.FundHandler;
+import br.dev.jstec.tyginvestiment.services.handlers.assets.StockHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +21,16 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AssetController {
 
-    private final StockHandler handler;
+    private final StockHandler stockHandler;
     private final FundHandler fundHandler;
     private final CryptoHandler cryptoHandler;
 
     @PostMapping("/stocks")
-    public ResponseEntity<StockDto> saveAsset(@RequestParam String symbol) {
+    public ResponseEntity<StockDto> saveAsset(
+            @RequestParam AssetMarketLocation marketLocation,
+            @RequestParam String symbol) {
 
-        var asset = handler.save(symbol.toUpperCase());
+        var asset = stockHandler.save(marketLocation, symbol.toUpperCase());
 
         return ResponseEntity.status(201).body(asset);
     }

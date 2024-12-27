@@ -1,17 +1,21 @@
-package br.dev.jstec.tyginvestiment.services.handlers;
+package br.dev.jstec.tyginvestiment.services.handlers.assets;
 
 import br.dev.jstec.tyginvestiment.clients.GeckoCoinClient;
 import br.dev.jstec.tyginvestiment.clients.dto.CoinGeckoCriptoDto;
+import br.dev.jstec.tyginvestiment.dto.assetstype.AssetDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.CryptoDto;
+import br.dev.jstec.tyginvestiment.enums.AssetMarketLocation;
 import br.dev.jstec.tyginvestiment.enums.AssetType;
 import br.dev.jstec.tyginvestiment.events.AssetSavedEvent;
 import br.dev.jstec.tyginvestiment.exception.ErrorMessage;
 import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
-import br.dev.jstec.tyginvestiment.models.Crypto;
 import br.dev.jstec.tyginvestiment.repository.CryptoRepository;
+import br.dev.jstec.tyginvestiment.services.handlers.AssetHistoryHandler;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
+import br.dev.jstec.tyginvestiment.services.strategy.AssetStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,17 +29,22 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Component("CRYPTO")
 @RequiredArgsConstructor
 @Slf4j
-public class CryptoHandler implements AssetHandler<Crypto, CryptoDto> {
+public class CryptoHandler implements AssetStrategy {
 
-    private final AssetMapper mapper;
-    private final CryptoRepository cryptoRepository;
-    private final GeckoCoinClient geckoCoinClient;
-    private final CurrencyHandler currencyHandler;
-    private final AssetHistoryHandler assetHistoryHandler;
-    private final ApplicationEventPublisher publisher;
+    @Autowired
+    private AssetMapper assetMapper;
+    @Autowired
+    private CryptoRepository cryptoRepository;
+    @Autowired
+    private GeckoCoinClient geckoCoinClient;
+    @Autowired
+    private CurrencyHandler currencyHandler;
+    @Autowired
+    private AssetHistoryHandler assetHistoryHandler;
+    @Autowired
+    private ApplicationEventPublisher publisher;
 
     @Transactional
-    @Override
     public CryptoDto save(String name, String currency) {
 
         if (isBlank(name)) {
@@ -52,7 +61,7 @@ public class CryptoHandler implements AssetHandler<Crypto, CryptoDto> {
 
         completeCryptoInfo(asset, currency);
 
-        var entity = mapper.toEntity(asset);
+        var entity = assetMapper.toEntity(asset);
 
         var entitySaved = cryptoRepository.save(entity);
 
@@ -60,26 +69,16 @@ public class CryptoHandler implements AssetHandler<Crypto, CryptoDto> {
             publisher.publishEvent(new AssetSavedEvent(this, entitySaved));
         }
 
-        return mapper.toDto(entitySaved);
+        return assetMapper.toDto(entitySaved);
     }
 
-    @Override
     @Transactional(readOnly = true)
     public CryptoDto findById(String symbol) {
         return cryptoRepository.findById(symbol)
-                .map(mapper::toDto)
+                .map(assetMapper::toDto)
                 .orElseThrow(() -> new InfrastructureException(ErrorMessage.ASSET_NOT_FOUND, symbol));
     }
 
-    @Override
-    public CryptoDto save(CryptoDto dto) {
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
-    @Override
-    public CryptoDto save(String symbol) {
-        throw new UnsupportedOperationException("Method not implemented");
-    }
 
     @Transactional
     public CoinGeckoCriptoDto getAsset(String id, String currency) {
@@ -98,5 +97,10 @@ public class CryptoHandler implements AssetHandler<Crypto, CryptoDto> {
         dto.setSymbol(dto.getSymbol().toUpperCase());
         dto.setAssetType(AssetType.CRYPTO);
         dto.setCurrency(currency);
+    }
+
+    @Override
+    public <T extends AssetDto> T save(AssetMarketLocation marketLocation, String symbol) {
+        return null;
     }
 }

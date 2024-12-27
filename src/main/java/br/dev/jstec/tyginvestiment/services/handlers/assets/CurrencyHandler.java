@@ -1,4 +1,4 @@
-package br.dev.jstec.tyginvestiment.services.handlers;
+package br.dev.jstec.tyginvestiment.services.handlers.assets;
 
 import br.dev.jstec.tyginvestiment.clients.CurrencyClient;
 import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
@@ -9,6 +9,7 @@ import br.dev.jstec.tyginvestiment.models.UserCurrencies;
 import br.dev.jstec.tyginvestiment.repository.CurrencyTargetRepository;
 import br.dev.jstec.tyginvestiment.repository.UserCurrenciesRepository;
 import br.dev.jstec.tyginvestiment.repository.UserRepository;
+import br.dev.jstec.tyginvestiment.services.handlers.ConversionRateHandler;
 import br.dev.jstec.tyginvestiment.services.mappers.CurrencyMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ public class CurrencyHandler {
 
     private final CurrencyTargetRepository currencyRepository;
     private final ConversionRateHandler conversionRateHandler;
-    private final CurrencyMapper mapper;
+    private final CurrencyMapper currencyMapper;
     private final CurrencyClient client;
     private final UserRepository userRepository;
     private final UserCurrenciesRepository userCurrenciesRepository;
@@ -62,7 +63,7 @@ public class CurrencyHandler {
                 .filter(userCurrency -> userCurrency.getCurrency().getCode().equals(currencyExist.getCode()))
                 .findFirst()
                 .map(UserCurrencies::getCurrency)
-                .map(mapper::toDto)
+                .map(currencyMapper::toDto)
                 .orElse(null);
 
         if (nonNull(currencyFound)) {
@@ -75,7 +76,7 @@ public class CurrencyHandler {
         userCurrency.setActive(true);
 
         var currencySaved = userCurrenciesRepository.save(userCurrency);
-        return mapper.toDto(currencySaved.getCurrency());
+        return currencyMapper.toDto(currencySaved.getCurrency());
     }
 
     private br.dev.jstec.tyginvestiment.models.Currency saveCurrency(CurrencyDto dto, boolean isBase) {
@@ -93,7 +94,7 @@ public class CurrencyHandler {
         dto.setName(currency.getDisplayName(locale));
         dto.setSymbol(currency.getSymbol(locale));
 
-        var entity = mapper.toEntity(dto);
+        var entity = currencyMapper.toEntity(dto);
         var saved = currencyRepository.save(entity);
 
         conversionRateHandler
@@ -110,7 +111,7 @@ public class CurrencyHandler {
         }
 
         return currencyRepository.findByCode(code)
-                .map(mapper::toDto)
+                .map(currencyMapper::toDto)
                 .orElseThrow(() -> new BusinessException(CURRENCY_NOT_FOUND));
     }
 

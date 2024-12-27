@@ -3,7 +3,7 @@ package br.dev.jstec.tyginvestiment.controllers;
 import br.dev.jstec.tyginvestiment.dto.CurrencyDto;
 import br.dev.jstec.tyginvestiment.dto.currencies.CurrencyDataDto;
 import br.dev.jstec.tyginvestiment.dto.currencies.CurrencyQuotationHistoryDto;
-import br.dev.jstec.tyginvestiment.services.handlers.CurrencyHandler;
+import br.dev.jstec.tyginvestiment.services.handlers.assets.CurrencyHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

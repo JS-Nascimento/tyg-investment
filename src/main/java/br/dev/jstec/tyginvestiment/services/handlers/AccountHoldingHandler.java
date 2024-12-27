@@ -1,14 +1,14 @@
 package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.dto.AccountHoldingDto;
-import br.dev.jstec.tyginvestiment.dto.assetstype.AssetDto;
 import br.dev.jstec.tyginvestiment.events.AssetTransactionSavedEvent;
 import br.dev.jstec.tyginvestiment.exception.BusinessException;
 import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
-import br.dev.jstec.tyginvestiment.models.Asset;
 import br.dev.jstec.tyginvestiment.models.AssetTransaction;
 import br.dev.jstec.tyginvestiment.repository.AccountHoldingRepository;
+import br.dev.jstec.tyginvestiment.services.handlers.assets.StockHandler;
 import br.dev.jstec.tyginvestiment.services.mappers.AccountHoldingMapper;
+import br.dev.jstec.tyginvestiment.services.strategy.AssetStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,17 +29,17 @@ import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ASSET_INVALID_I
 public class AccountHoldingHandler {
 
     private final AccountHoldingRepository repository;
-    private final AccountHoldingMapper mapper;
+    private final AccountHoldingMapper accountHoldingMapper;
     private final AccountHandler accountHandler;
     private final StockHandler stockHandler;
     private final ApplicationEventPublisher publisher;
 
-    private final Map<String, AssetHandler<? extends Asset, ? extends AssetDto>> handlers;
+    private final Map<String, AssetStrategy> handlers;
 
     public AccountHoldingDto findById(Long accountId, String assetId) {
         return repository
                 .findAccountHoldingByAccountIdAndAssetId(accountId, assetId)
-                .map(mapper::toDto).orElse(null);
+                .map(accountHoldingMapper::toDto).orElse(null);
     }
 
 
@@ -67,13 +67,13 @@ public class AccountHoldingHandler {
         dto.setAccount(account);
         dto.setAsset(asset);
 
-        var entity = repository.save(mapper.toEntity(dto));
+        var entity = repository.save(accountHoldingMapper.toEntity(dto));
 
-        var transaction = mapper.toTransactionByCreateHolding(entity);
+        var transaction = accountHoldingMapper.toTransactionByCreateHolding(entity);
 
         publisher.publishEvent(new AssetTransactionSavedEvent(this, transaction));
 
-        return mapper.toDto(entity);
+        return accountHoldingMapper.toDto(entity);
     }
 
     @Transactional
