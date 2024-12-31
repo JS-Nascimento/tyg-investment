@@ -1,8 +1,8 @@
 package br.dev.jstec.tyginvestiment.services.mappers;
 
-import br.dev.jstec.tyginvestiment.clients.dto.AlphaVantageClient;
+import br.dev.jstec.tyginvestiment.clients.alphaclient.dto.AlphaVantageClient;
+import br.dev.jstec.tyginvestiment.clients.alphaclient.dto.EtfProfileDto;
 import br.dev.jstec.tyginvestiment.clients.dto.CoinGeckoCriptoDto;
-import br.dev.jstec.tyginvestiment.clients.dto.EtfProfileDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.CryptoDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;

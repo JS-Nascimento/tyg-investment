@@ -1,7 +1,7 @@
 package br.dev.jstec.tyginvestiment.services.handlers;
 
-import br.dev.jstec.tyginvestiment.clients.AlphaClient;
 import br.dev.jstec.tyginvestiment.clients.GeckoCoinClient;
+import br.dev.jstec.tyginvestiment.clients.alphaclient.AlphaClient;
 import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.models.AssetTransaction;
 import br.dev.jstec.tyginvestiment.models.StockQuotation;

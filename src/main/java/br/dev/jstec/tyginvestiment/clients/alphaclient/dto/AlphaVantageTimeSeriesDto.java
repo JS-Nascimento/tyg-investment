@@ -1,5 +1,7 @@
-package br.dev.jstec.tyginvestiment.clients.dto;
+package br.dev.jstec.tyginvestiment.clients.alphaclient.dto;
 
+import br.dev.jstec.tyginvestiment.clients.dto.DailyPriceDto;
+import br.dev.jstec.tyginvestiment.clients.dto.MetaDataDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

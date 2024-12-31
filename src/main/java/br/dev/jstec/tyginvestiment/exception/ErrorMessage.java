@@ -20,6 +20,8 @@ public enum ErrorMessage {
     ACCOUNT_NOT_FOUND(113, "Conta não encontrada com o id: {0}"),
     ASSET_INVALID_INFORMATION(114, "Informação inválida para o ativo."),
     TRANSACTION_TYPE_NOT_FOUND(115, "Tipo de transação não encontrado."),
+    BRAPI_RANGE_NOT_FOUND(116, "Intervalo de tempo não encontrado."),
+    BRAPI_INTERVAL_NOT_FOUND(117, "Intervalo de tempo não encontrado."),
     ;
 
     private final int code;

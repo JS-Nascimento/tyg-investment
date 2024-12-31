@@ -1,4 +1,4 @@
-package br.dev.jstec.tyginvestiment.clients.dto;
+package br.dev.jstec.tyginvestiment.clients.alphaclient.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

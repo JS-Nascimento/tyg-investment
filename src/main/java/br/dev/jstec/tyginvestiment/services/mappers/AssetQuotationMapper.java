@@ -1,8 +1,8 @@
 package br.dev.jstec.tyginvestiment.services.mappers;
 
+import br.dev.jstec.tyginvestiment.clients.alphaclient.dto.GlobalQuoteDto;
 import br.dev.jstec.tyginvestiment.clients.dto.GeckoSimplePriceDto;
 import br.dev.jstec.tyginvestiment.clients.dto.GeckoSimplePriceDto.CurrencyData;
-import br.dev.jstec.tyginvestiment.clients.dto.GlobalQuoteDto;
 import br.dev.jstec.tyginvestiment.models.Asset;
 import br.dev.jstec.tyginvestiment.models.StockQuotation;
 import org.mapstruct.Mapper;

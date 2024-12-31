@@ -1,6 +1,6 @@
 package br.dev.jstec.tyginvestiment.services.validators;
 
-import br.dev.jstec.tyginvestiment.clients.dto.AlphaVantageInformation;
+import br.dev.jstec.tyginvestiment.clients.alphaclient.dto.AlphaVantageInformation;
 import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ALPHA_VANTAGE_REQUEST_ERROR;

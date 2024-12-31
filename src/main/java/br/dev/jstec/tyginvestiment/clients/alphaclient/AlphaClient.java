@@ -1,9 +1,9 @@
-package br.dev.jstec.tyginvestiment.clients;
+package br.dev.jstec.tyginvestiment.clients.alphaclient;
 
-import br.dev.jstec.tyginvestiment.clients.dto.AlphaVantageClient;
-import br.dev.jstec.tyginvestiment.clients.dto.AlphaVantageTimeSeriesDto;
-import br.dev.jstec.tyginvestiment.clients.dto.EtfProfileDto;
-import br.dev.jstec.tyginvestiment.clients.dto.GlobalQuoteResponseDto;
+import br.dev.jstec.tyginvestiment.clients.alphaclient.dto.AlphaVantageClient;
+import br.dev.jstec.tyginvestiment.clients.alphaclient.dto.AlphaVantageTimeSeriesDto;
+import br.dev.jstec.tyginvestiment.clients.alphaclient.dto.EtfProfileDto;
+import br.dev.jstec.tyginvestiment.clients.alphaclient.dto.GlobalQuoteResponseDto;
 import br.dev.jstec.tyginvestiment.config.FeignConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;

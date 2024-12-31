@@ -1,6 +1,7 @@
 package br.dev.jstec.tyginvestiment.services.handlers.assets;
 
-import br.dev.jstec.tyginvestiment.clients.AlphaClient;
+import br.dev.jstec.tyginvestiment.clients.alphaclient.AlphaClient;
+import br.dev.jstec.tyginvestiment.clients.brapi.BrapiClient;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
 import br.dev.jstec.tyginvestiment.enums.AssetMarketLocation;
 import br.dev.jstec.tyginvestiment.events.AssetSavedEvent;
@@ -33,13 +34,20 @@ public class StockHandler implements AssetStrategy {
     private StockRepository stockRepository;
     @Autowired
     private AlphaClient alphaClient;
+
+    @Autowired
+    private BrapiClient brapiClient;
+
     @Autowired
     private ApplicationEventPublisher publisher;
     @Autowired
     private AssetHistoryHandler assetHistoryHandler;
 
     @Value("${alpha-vantage.api-key}")
-    private String apiKey;
+    private String alphaVantageApiKey;
+
+    @Value("${brapi-api.token}")
+    private String brapiToken;
 
     @Override
     @Transactional
@@ -73,7 +81,7 @@ public class StockHandler implements AssetStrategy {
 
         switch (marketLocation) {
             case BR:
-                return assetMapper.toEntity(alphaClient.getAssetInfo(symbol, apiKey));
+                return brapiClient.getAssetInfo(brapiToken);
             case US:
                 var asset = alphaClient.getAssetInfo(symbol, apiKey);
                 validateClientApiResponse(asset);
