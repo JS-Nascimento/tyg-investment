@@ -18,6 +18,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import static br.dev.jstec.tyginvestiment.clients.brapi.BrapiIntervalOptions.ONE_DAY;
+import static br.dev.jstec.tyginvestiment.clients.brapi.BrapiRangeOptions.THREE_MONTHS;
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ASSET_NOT_FOUND;
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ATTRIBUTE_NOT_FOUND;
 import static br.dev.jstec.tyginvestiment.services.validators.AssetBussinessRulesValidator.validateClientApiResponse;
@@ -51,12 +55,12 @@ public class StockHandler implements AssetStrategy {
 
     @Override
     @Transactional
-    public StockDto save(AssetMarketLocation marketLocation, String symbol) {
+    public StockDto save(AssetMarketLocation marketLocation, List<String> symbols) {
 
-        var asset = getAsset(marketLocation, symbol);
+        var asset = getAsset(marketLocation, symbols);
 
         if (isNull(asset)) {
-            throw new InfrastructureException(ASSET_NOT_FOUND, symbol);
+            throw new InfrastructureException(ASSET_NOT_FOUND, symbols.toString());
         }
 
         var entitySaved = stockRepository.save(asset);
@@ -76,14 +80,13 @@ public class StockHandler implements AssetStrategy {
                 .orElseThrow(() -> new InfrastructureException(ASSET_NOT_FOUND, symbol));
     }
 
-
-    private Stock getAsset(AssetMarketLocation marketLocation, String symbol) {
+    private Stock getAsset(AssetMarketLocation marketLocation, List<String> symbols) {
 
         switch (marketLocation) {
             case BR:
-                return brapiClient.getAssetInfo(brapiToken);
+                return brapiClient.getAssetInfo(symbols, brapiToken, THREE_MONTHS, ONE_DAY, true, false, List.of());
             case US:
-                var asset = alphaClient.getAssetInfo(symbol, apiKey);
+                var asset = alphaClient.getAssetInfo(symbols.getFirst(), alphaVantageApiKey);
                 validateClientApiResponse(asset);
                 return assetMapper.toEntity(asset);
             default:
