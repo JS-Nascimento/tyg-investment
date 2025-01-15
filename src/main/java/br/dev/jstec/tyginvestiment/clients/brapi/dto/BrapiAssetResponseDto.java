@@ -1,24 +1,36 @@
 package br.dev.jstec.tyginvestiment.clients.brapi.dto;
 
+import br.dev.jstec.tyginvestiment.config.jackson.CustomOffsetDateTimeDeserializer;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BrapiAssetResponseDto {
-    private List<ResultDTO> results;
+    private List<BrapiAssetResultDTO> results;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     private LocalDateTime requestedAt;
     private String took;
 
     @Data
-    public static class ResultDTO {
+    public static class BrapiAssetResultDTO {
         private String currency;
         private String shortName;
         private String longName;
         private BigDecimal regularMarketChange;
         private BigDecimal regularMarketChangePercent;
+
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
         private LocalDateTime regularMarketTime;
+
         private BigDecimal regularMarketPrice;
         private BigDecimal regularMarketDayHigh;
         private String regularMarketDayRange;
@@ -61,7 +73,8 @@ public class BrapiAssetResponseDto {
 
             @Data
             public static class BalanceSheetStatementDTO {
-                private LocalDateTime endDate;
+                @JsonDeserialize(using = CustomOffsetDateTimeDeserializer.class)
+                private OffsetDateTime endDate;
                 private BigDecimal cash;
                 private BigDecimal netReceivables;
                 private BigDecimal inventory;
@@ -98,7 +111,8 @@ public class BrapiAssetResponseDto {
 
             @Data
             public static class IncomeStatementDTO {
-                private LocalDateTime endDate;
+                @JsonDeserialize(using = CustomOffsetDateTimeDeserializer.class)
+                private OffsetDateTime endDate;
                 private BigDecimal totalRevenue;
                 private BigDecimal costOfRevenue;
                 private BigDecimal grossProfit;
@@ -132,8 +146,11 @@ public class BrapiAssetResponseDto {
             private BigDecimal impliedSharesOutstanding;
             private BigDecimal bookValue;
             private BigDecimal priceToBook;
+            @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
             private LocalDateTime lastFiscalYearEnd;
+            @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
             private LocalDateTime nextFiscalYearEnd;
+            @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
             private LocalDateTime mostRecentQuarter;
             private BigDecimal earningsQuarterlyGrowth;
             private BigDecimal netIncomeToCommon;
@@ -143,10 +160,14 @@ public class BrapiAssetResponseDto {
             private Long lastSplitDate;
             private BigDecimal enterpriseToRevenue;
             private BigDecimal enterpriseToEbitda;
+            @JsonProperty("52WeekChange")
             private BigDecimal weekChange52;
+            @JsonProperty("SandP52WeekChange")
             private BigDecimal sandP52WeekChange;
             private BigDecimal lastDividendValue;
-            private LocalDateTime lastDividendDate;
+
+            @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+            private OffsetDateTime lastDividendDate;
         }
 
         @Data
@@ -166,14 +187,14 @@ public class BrapiAssetResponseDto {
             private String sectorKey;
             private String sectorDisp;
             private String longBusinessSummary;
-            private List<Object> companyOfficers;
+            private List<String> companyOfficers;
         }
 
         @Data
         public static class DividendsDataDTO {
-            private List<Object> cashDividends;
-            private List<Object> stockDividends;
-            private List<Object> subscriptions;
+            private List<String> cashDividends;
+            private List<String> stockDividends;
+            private List<String> subscriptions;
         }
     }
 }

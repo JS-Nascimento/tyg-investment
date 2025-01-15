@@ -1,7 +1,6 @@
 package br.dev.jstec.tyginvestiment.services.handlers.assets;
 
-import br.dev.jstec.tyginvestiment.clients.AlphaClient;
-import br.dev.jstec.tyginvestiment.clients.dto.EtfProfileDto;
+import br.dev.jstec.tyginvestiment.clients.alphaclient.dto.EtfProfileDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.AssetDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
 import br.dev.jstec.tyginvestiment.enums.AssetMarketLocation;
@@ -20,6 +19,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ASSET_NOT_FOUND;
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ATTRIBUTE_NOT_FOUND;
 import static br.dev.jstec.tyginvestiment.services.validators.AssetBussinessRulesValidator.validateClientApiResponse;
@@ -37,7 +38,7 @@ public class FundHandler implements AssetStrategy {
     @Autowired
     private FundRepository fundRepository;
     @Autowired
-    private AlphaClient alphaClient;
+    private br.dev.jstec.tyginvestiment.clients.alphaclient.AlphaClient alphaClient;
     @Autowired
     private CurrencyHandler currencyHandler;
     @Autowired
@@ -49,25 +50,27 @@ public class FundHandler implements AssetStrategy {
     private String apiKey;
 
     @Transactional(timeout = 300)
-    public FundDto save(String symbol, String currency) {
+    public FundDto save(AssetMarketLocation marketLocation, List<String> symbols) {
 
-        if (isBlank(symbol)) {
+        if (isNull(symbols) || symbols.isEmpty()) {
             throw new InfrastructureException(ATTRIBUTE_NOT_FOUND, "SIMBOLO");
         }
+
+        var currency = AssetMarketLocation.getCurrency(marketLocation);
 
         if (isBlank(currency)) {
             throw new InfrastructureException(ATTRIBUTE_NOT_FOUND, "MOEDA");
         }
 
-        var asset = getAsset(symbol);
+        var asset = getAsset(symbols.getFirst());
 
         if (isNull(asset)) {
-            throw new InfrastructureException(ASSET_NOT_FOUND, symbol);
+            throw new InfrastructureException(ASSET_NOT_FOUND, symbols.getFirst());
         }
 
         currencyHandler.verifyAndSaveIfNotExists(currency);
 
-        completeFundInfo(asset, symbol, currency);
+        completeFundInfo(asset, symbols.getFirst(), currency);
 
         var entity = assetMapper.toEntity(asset);
 
@@ -109,8 +112,9 @@ public class FundHandler implements AssetStrategy {
         dto.setCurrency(Currency);
     }
 
+
     @Override
-    public <T extends AssetDto> T save(AssetMarketLocation marketLocation, String symbol) {
-        return null;
+    public AssetDto save(AssetMarketLocation marketLocation, String symbol) {
+        return save(marketLocation, List.of(symbol));
     }
 }

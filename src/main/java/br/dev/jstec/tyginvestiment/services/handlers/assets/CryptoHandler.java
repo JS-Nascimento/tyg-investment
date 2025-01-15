@@ -20,11 +20,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ASSET_NOT_FOUND;
 import static br.dev.jstec.tyginvestiment.exception.ErrorMessage.ATTRIBUTE_NOT_FOUND;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Component("CRYPTO")
 @RequiredArgsConstructor
@@ -45,12 +46,14 @@ public class CryptoHandler implements AssetStrategy {
     private ApplicationEventPublisher publisher;
 
     @Transactional
-    public CryptoDto save(String name, String currency) {
+    public CryptoDto save(AssetMarketLocation marketLocation, List<String> symbols) {
 
-        if (isBlank(name)) {
+        if (isNull(symbols) || symbols.isEmpty()) {
             throw new InfrastructureException(ATTRIBUTE_NOT_FOUND, "NOME");
         }
 
+        var currency = AssetMarketLocation.getCurrency(marketLocation);
+        var name = symbols.getFirst();
         var asset = getAsset(name, currency);
 
         if (isNull(asset)) {
@@ -71,6 +74,12 @@ public class CryptoHandler implements AssetStrategy {
 
         return assetMapper.toDto(entitySaved);
     }
+
+    @Override
+    public AssetDto save(AssetMarketLocation marketLocation, String symbol) {
+        return save(marketLocation, List.of(symbol));
+    }
+
 
     @Transactional(readOnly = true)
     public CryptoDto findById(String symbol) {
@@ -99,8 +108,4 @@ public class CryptoHandler implements AssetStrategy {
         dto.setCurrency(currency);
     }
 
-    @Override
-    public <T extends AssetDto> T save(AssetMarketLocation marketLocation, String symbol) {
-        return null;
-    }
 }

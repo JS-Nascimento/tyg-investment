@@ -8,6 +8,14 @@ import lombok.Getter;
 public enum AssetMarketLocation {
     BR,
     US,
-    EU,
+    EU;
+
+    public static String getCurrency(AssetMarketLocation location) {
+        return switch (location) {
+            case US -> "USD";
+            case EU -> "EUR";
+            case BR -> "BRL";
+        };
+    }
 }
 

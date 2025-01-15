@@ -1,8 +1,6 @@
 package br.dev.jstec.tyginvestiment.controllers;
 
-import br.dev.jstec.tyginvestiment.dto.assetstype.CryptoDto;
-import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
-import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
+import br.dev.jstec.tyginvestiment.dto.assetstype.AssetDto;
 import br.dev.jstec.tyginvestiment.enums.AssetMarketLocation;
 import br.dev.jstec.tyginvestiment.services.handlers.assets.CryptoHandler;
 import br.dev.jstec.tyginvestiment.services.handlers.assets.FundHandler;
@@ -15,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/assets")
 @RequiredArgsConstructor
@@ -26,27 +26,27 @@ public class AssetController {
     private final CryptoHandler cryptoHandler;
 
     @PostMapping("/stocks")
-    public ResponseEntity<StockDto> saveAsset(
+    public ResponseEntity<AssetDto> saveAsset(
             @RequestParam AssetMarketLocation marketLocation,
             @RequestParam String symbol) {
 
-        var asset = stockHandler.save(marketLocation, symbol.toUpperCase());
+        var asset = stockHandler.save(marketLocation, List.of(symbol.toUpperCase()));
 
         return ResponseEntity.status(201).body(asset);
     }
 
     @PostMapping("/funds")
-    public ResponseEntity<FundDto> saveAsset(@RequestParam String symbol, @RequestParam String currency) {
+    public ResponseEntity<AssetDto> saveAsset(@RequestParam String symbol, @RequestParam AssetMarketLocation marketLocation) {
 
-        var asset = fundHandler.save(symbol.toUpperCase(), currency);
+        var asset = fundHandler.save(marketLocation, symbol.toUpperCase());
 
         return ResponseEntity.status(201).body(asset);
     }
 
     @PostMapping("/cryptos")
-    public ResponseEntity<CryptoDto> saveCrypto(@RequestParam String symbol, @RequestParam String currency) {
+    public ResponseEntity<AssetDto> saveCrypto(@RequestParam String symbol, @RequestParam AssetMarketLocation marketLocation) {
 
-        var asset = cryptoHandler.save(symbol.toUpperCase(), currency);
+        var asset = cryptoHandler.save(marketLocation, symbol.toUpperCase());
 
         return ResponseEntity.status(201).body(asset);
     }

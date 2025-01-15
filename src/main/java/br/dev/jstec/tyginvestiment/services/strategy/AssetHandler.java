@@ -16,7 +16,7 @@ public class AssetHandler {
 
     private final Map<String, AssetStrategy> assetStrategies;
 
-    public <T extends AssetDto> T save(AssetMarketLocation assetMarketLocation, AssetType assetType, String symbol) {
+    public AssetDto save(AssetMarketLocation assetMarketLocation, AssetType assetType, String symbol) {
 
         validateInputs(assetMarketLocation, assetType, symbol);
 

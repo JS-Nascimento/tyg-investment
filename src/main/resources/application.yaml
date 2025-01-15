@@ -122,4 +122,4 @@ brapi-api:
   token: ${BRAPI_API_TOKEN}
   service:
     get-assets-list: /quote/list
-    get-assets-info: /api/quote
+    get-assets-info: /quote

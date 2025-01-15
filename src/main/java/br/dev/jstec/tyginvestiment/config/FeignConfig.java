@@ -6,12 +6,10 @@ import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
-import feign.optionals.OptionalDecoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
-import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,11 +40,20 @@ public class FeignConfig {
             }
         };
     }
-
     @Bean
-    public Decoder feignDecoder() {
-        return new OptionalDecoder(new SpringDecoder(jacksonHttpMessageConverterFactory()));
+    public Decoder feignDecoder(ObjectMapper objectMapper) {
+        return (response, type) -> {
+            String body = new String(response.body().asInputStream().readAllBytes());
+            log.info("Feign Response Body: {}", body); // Log da resposta
+            return objectMapper.readValue(body, objectMapper.constructType(type));
+        };
     }
+
+//
+//    @Bean
+//    public Decoder feignDecoder() {
+//        return new OptionalDecoder(new SpringDecoder(jacksonHttpMessageConverterFactory()));
+//    }
 
 
     private ObjectFactory<HttpMessageConverters> jacksonHttpMessageConverterFactory() {

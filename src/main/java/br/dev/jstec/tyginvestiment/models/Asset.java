@@ -29,5 +29,3 @@ public abstract class Asset extends Auditable<Long>{
 
     protected String currency;
 }
-// Criar modelo de dados para a tabela de ativos da Brapi API
-// Mapper para converter os dados da API para o modelo de dados
