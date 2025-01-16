@@ -8,6 +8,7 @@ import br.dev.jstec.tyginvestiment.dto.assetstype.BrapiAssetDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.CryptoDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.FundDto;
 import br.dev.jstec.tyginvestiment.dto.assetstype.StockDto;
+import br.dev.jstec.tyginvestiment.dto.assetstype.brapi.HistoricalDataPriceDTO;
 import br.dev.jstec.tyginvestiment.enums.AssetType;
 import br.dev.jstec.tyginvestiment.models.BrapiAsset;
 import br.dev.jstec.tyginvestiment.models.Crypto;
@@ -19,6 +20,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public abstract class AssetMapper {
@@ -86,6 +88,8 @@ public abstract class AssetMapper {
     @Mapping(target = "currency", source = "currency")
     @Mapping(target = "assetType", source = "assetType", qualifiedByName = "mapAssetType")
     public abstract CryptoDto toDtoSimplified(Crypto entity);
+
+    public abstract List<HistoricalDataPriceDTO> toHistoricalDataPriceDTO(List<BrapiAssetResponseDto.BrapiAssetResultDTO.HistoricalDataPriceDTO> dto);
 
     @Named("mapAssetType")
     public AssetType mapAssetType(String assetType) {

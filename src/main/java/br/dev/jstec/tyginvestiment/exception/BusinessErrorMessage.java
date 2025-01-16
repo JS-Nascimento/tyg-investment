@@ -24,6 +24,7 @@ public enum BusinessErrorMessage {
     ASSET_TYPE_REQUIRED(16, "Tipo de ativo é obrigatório"),
     ASSET_MARKET_LOCATION_REQUIRED(17, "Localização do ativo é obrigatória"),
     ASSET_SYMBOL_REQUIRED(18, "Ticker do ativo é obrigatório"),
+    HISTORY_NOT_FOUND(19, "Histórico não encontrado para o ativo {0}"),
     ;
 
     private final int code;

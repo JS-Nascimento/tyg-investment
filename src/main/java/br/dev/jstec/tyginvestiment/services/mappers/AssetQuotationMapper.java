@@ -3,6 +3,7 @@ package br.dev.jstec.tyginvestiment.services.mappers;
 import br.dev.jstec.tyginvestiment.clients.alphaclient.dto.GlobalQuoteDto;
 import br.dev.jstec.tyginvestiment.clients.dto.GeckoSimplePriceDto;
 import br.dev.jstec.tyginvestiment.clients.dto.GeckoSimplePriceDto.CurrencyData;
+import br.dev.jstec.tyginvestiment.dto.assetstype.brapi.HistoricalDataPriceDTO;
 import br.dev.jstec.tyginvestiment.models.Asset;
 import br.dev.jstec.tyginvestiment.models.StockQuotation;
 import org.mapstruct.Mapper;
@@ -11,6 +12,7 @@ import org.mapstruct.Named;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Map;
 
 @Mapper(componentModel = "spring")
@@ -36,6 +38,31 @@ public abstract class AssetQuotationMapper {
         quotation.setChange(globalQuoteDto.getChange());
         quotation.setChangePercent(globalQuoteDto.getChangePercent());
         return quotation;
+    }
+
+    @Named("toBrapiQuotationList")
+    public List<StockQuotation> toBrapiQuotationList(List<HistoricalDataPriceDTO> dtoList, Asset asset) {
+
+        if (dtoList == null || dtoList.isEmpty() || asset == null) {
+            return null;
+        }
+
+        return dtoList.stream()
+                .map(dto -> {
+                    var quotation = new StockQuotation();
+                    quotation.setAsset(asset);
+                    quotation.setOpen(dto.getOpen());
+                    quotation.setHigh(dto.getHigh());
+                    quotation.setLow(dto.getLow());
+                    quotation.setPreviousClose(dto.getClose());
+                    quotation.setClose(dto.getAdjustedClose());
+                    quotation.setVolume(dto.getVolume().doubleValue());
+                    quotation.setDate(Instant.ofEpochSecond(dto.getDate())
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime());
+                    return quotation;
+                })
+                .toList();
     }
 
     @Named("toCryptoQuotation")

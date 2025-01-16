@@ -13,6 +13,7 @@ import br.dev.jstec.tyginvestiment.exception.InfrastructureException;
 import br.dev.jstec.tyginvestiment.repository.BrapiAssetRepository;
 import br.dev.jstec.tyginvestiment.repository.StockRepository;
 import br.dev.jstec.tyginvestiment.services.handlers.AssetHistoryHandler;
+import br.dev.jstec.tyginvestiment.services.handlers.StockQuotationHandler;
 import br.dev.jstec.tyginvestiment.services.mappers.AssetMapper;
 import br.dev.jstec.tyginvestiment.services.strategy.AssetStrategy;
 import lombok.extern.slf4j.Slf4j;
@@ -51,8 +52,13 @@ public class StockHandler implements AssetStrategy {
 
     @Autowired
     private ApplicationEventPublisher publisher;
+
     @Autowired
     private AssetHistoryHandler assetHistoryHandler;
+
+    @Autowired
+    private StockQuotationHandler stockQuotationHandler;
+
 
     @Value("${alpha-vantage.api-key}")
     private String alphaVantageApiKey;
@@ -100,8 +106,11 @@ public class StockHandler implements AssetStrategy {
 
         var assetSaved = brapiAssetRepository.save(entity);
 
-        if (nonNull(assetSaved.getSymbol())) {
-            publisher.publishEvent(new AssetSavedEvent(this, assetSaved));
+        if (nonNull(assetSaved) && nonNull(assetSaved.getSymbol())) {
+
+            var historicalData = assetMapper.toHistoricalDataPriceDTO(brapi.getResults().getFirst().getHistoricalDataPrice());
+
+            stockQuotationHandler.saveHistoricalData(assetSaved.getSymbol(), historicalData);
         }
 
         return assetMapper.toDto(assetSaved);

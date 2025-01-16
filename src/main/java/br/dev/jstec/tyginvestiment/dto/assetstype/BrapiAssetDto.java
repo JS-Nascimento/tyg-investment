@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -37,5 +38,6 @@ public class BrapiAssetDto extends AssetDto {
     private BigDecimal earningsPerShare;
     private String logourl;
     private DividendsDataDto dividendsData;
+    private List<HistoricalDataPriceDTO> historicalDataPrice;
 
 }

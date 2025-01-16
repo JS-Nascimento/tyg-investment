@@ -2,7 +2,9 @@ package br.dev.jstec.tyginvestiment.services.handlers;
 
 import br.dev.jstec.tyginvestiment.clients.GeckoCoinClient;
 import br.dev.jstec.tyginvestiment.clients.alphaclient.AlphaClient;
+import br.dev.jstec.tyginvestiment.dto.assetstype.brapi.HistoricalDataPriceDTO;
 import br.dev.jstec.tyginvestiment.enums.AssetType;
+import br.dev.jstec.tyginvestiment.exception.BusinessException;
 import br.dev.jstec.tyginvestiment.models.Asset;
 import br.dev.jstec.tyginvestiment.repository.AssetRepository;
 import br.dev.jstec.tyginvestiment.repository.StockQuotationRepository;
@@ -13,7 +15,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
+
+import static br.dev.jstec.tyginvestiment.exception.BusinessErrorMessage.ASSET_NOT_FOUND;
+import static br.dev.jstec.tyginvestiment.exception.BusinessErrorMessage.HISTORY_NOT_FOUND;
 
 @Component
 @RequiredArgsConstructor
@@ -55,5 +61,19 @@ public class StockQuotationHandler {
                 }
             }
         });
+    }
+
+    @Transactional
+    public void saveHistoricalData(String symbol, List<HistoricalDataPriceDTO> historicalData) {
+        log.info("Getting historical data for {}", symbol);
+
+        var asset = assetRepository.findBySymbol(symbol)
+                .orElseThrow(() -> new BusinessException(ASSET_NOT_FOUND));
+
+        if (historicalData.isEmpty()) {
+            throw new BusinessException(HISTORY_NOT_FOUND, symbol);
+        }
+
+        stockQuotationRepository.saveAllAndFlush(assetQuotationMapper.toBrapiQuotationList(historicalData, asset));
     }
 }

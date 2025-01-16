@@ -15,18 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BrapiAsset extends Asset {
 
-
-//    @Column(nullable = false)
-//    private String symbol;
-
-//    @Column(nullable = false)
-//    private String currency;
-
     private String shortName;
-
-    //Usar name de assets
-//    @Column(nullable = false)
-//    private String longName;
 
     private BigDecimal regularMarketChange;
 
@@ -50,11 +39,11 @@ public class BrapiAsset extends Asset {
 
     private String fiftyTwoWeekRange;
 
-    @Column(name = "fiftyTwoWeekLow", precision = 38, scale = 2)
-    private BigDecimal fiftyTwoWeekLow;
+    @Column(name = "fiftyTwoWeekLow", precision = 38, scale = 2, nullable = false)
+    private BigDecimal fiftyTwoWeekLow = BigDecimal.ZERO;
 
-    @Column(name = "fiftyTwoWeekHigh", precision = 38, scale = 2)
-    private BigDecimal fiftyTwoWeekHigh;
+    @Column(name = "fiftyTwoWeekHigh", precision = 38, scale = 2, nullable = false)
+    private BigDecimal fiftyTwoWeekHigh = BigDecimal.ZERO;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "balance_sheet_history_id", referencedColumnName = "id")

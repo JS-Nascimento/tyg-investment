@@ -11,5 +11,14 @@ public class BusinessException extends RuntimeException {
         super(message.getMessage());
         this.code = message.getCode();
     }
+
+    public BusinessException(BusinessErrorMessage message, String... messageArguments) {
+        super(formatErrorMessage(message, messageArguments));
+        this.code = message.getCode();
+    }
+
+    private static String formatErrorMessage(BusinessErrorMessage message, String... messageArguments) {
+        return String.format(message.getMessage(), messageArguments);
+    }
 }
 
