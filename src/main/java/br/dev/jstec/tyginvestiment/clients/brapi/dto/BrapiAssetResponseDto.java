@@ -58,6 +58,7 @@ public class BrapiAssetResponseDto {
 
         @Data
         public static class HistoricalDataPriceDTO {
+
             private Long date;
             private BigDecimal open;
             private BigDecimal high;
@@ -65,6 +66,7 @@ public class BrapiAssetResponseDto {
             private BigDecimal close;
             private BigDecimal volume;
             private BigDecimal adjustedClose;
+
         }
 
         @Data
@@ -135,6 +137,7 @@ public class BrapiAssetResponseDto {
 
         @Data
         public static class DefaultKeyStatisticsDTO {
+            private String beta;
             private int priceHint;
             private BigDecimal enterpriseValue;
             private BigDecimal forwardPE;
@@ -192,9 +195,26 @@ public class BrapiAssetResponseDto {
 
         @Data
         public static class DividendsDataDTO {
-            private List<String> cashDividends;
+            private List<CashDividend> cashDividends;
             private List<String> stockDividends;
             private List<String> subscriptions;
+
+            @Data
+            public static class CashDividend {
+
+                private String assetIssued;
+                @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+                private LocalDateTime paymentDate;
+                private BigDecimal rate;
+                private String relatedTo;
+                @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+                private LocalDateTime approvedOn;
+                private String isinCode;
+                private String label;
+                @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+                private LocalDateTime lastDatePrior;
+                private String remarks;
+            }
         }
     }
 }

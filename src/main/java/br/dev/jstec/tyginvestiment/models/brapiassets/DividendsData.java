@@ -16,7 +16,7 @@ public class DividendsData {
 
     @ElementCollection
     @CollectionTable(name = "cash_dividends", joinColumns = @JoinColumn(name = "dividends_data_id"))
-    private List<String> cashDividends;
+    private List<CashDividend> cashDividends;
 
     @ElementCollection
     @CollectionTable(name = "stock_dividends", joinColumns = @JoinColumn(name = "dividends_data_id"))

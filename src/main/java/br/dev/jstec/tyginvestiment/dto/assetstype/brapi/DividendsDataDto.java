@@ -11,7 +11,7 @@ public class DividendsDataDto {
 
     private Long id;
 
-    private List<Object> cashDividends = new ArrayList<>();
+    private List<CashDividendDto> cashDividends = new ArrayList<>();
 
     private List<Object> stockDividends = new ArrayList<>();
 
